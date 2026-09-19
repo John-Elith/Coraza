@@ -344,6 +344,47 @@ body.reduce .aviso-movimiento{display:block}
   border:1px solid var(--linea);border-bottom-width:2px;border-radius:4px;padding:.05rem .35rem;
 }
 
+/* ---------- el celular ---------- */
+.celular-fila{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(1.5rem,4vw,3rem);align-items:center}
+@media(max-width:820px){.celular-fila{grid-template-columns:1fr}}
+
+.telefono{
+  width:255px;flex:none;justify-self:center;
+  border:10px solid #1B1517;border-radius:32px;background:var(--tinta);
+  box-shadow:0 30px 70px -34px #000, 0 0 0 1px rgba(223,217,216,.09);
+  overflow:hidden;
+}
+.tel-barra{
+  display:flex;align-items:center;gap:.4rem;padding:.55rem .7rem;
+  border-bottom:1px solid var(--linea);font-size:.72rem;
+}
+.tel-barra b{font-family:var(--f-display);font-weight:500;font-size:.9rem}
+.tel-barra i{width:6px;height:6px;border-radius:50%;background:var(--coral);animation:latir 1.9s ease-in-out infinite}
+.tel-cuerpo{padding:.6rem;display:flex;flex-direction:column;gap:.5rem}
+
+.tel-panico{display:grid;grid-template-columns:repeat(4,1fr);gap:.25rem}
+.tel-panico button{
+  padding:.45rem .1rem;border-radius:7px;cursor:pointer;
+  border:1px solid var(--linea);background:rgba(11,9,9,.6);
+  color:var(--humo);font-family:var(--f-mono);font-size:.55rem;letter-spacing:.03em;
+  transition:all .25s var(--ease);
+}
+.tel-panico button[aria-pressed="true"]{background:rgba(180,68,70,.34);color:#FDF6F5;border-color:rgba(252,143,143,.5)}
+
+.tel-tarjeta{border:1px solid var(--linea);border-radius:9px;background:var(--carbon);padding:.55rem .6rem}
+.tel-tarjeta .rotulo{font-size:.52rem;letter-spacing:.16em}
+.tel-vivo{font-size:.82rem;line-height:1.3;white-space:pre-wrap;min-height:3.2em;margin-top:.2rem;color:#F6EFEE}
+.tel-sig{font-size:.72rem;line-height:1.3;color:var(--humo);min-height:1.3em;margin-top:.2rem}
+
+.tel-flechas{display:grid;grid-template-columns:1fr 1fr;gap:.35rem}
+.tel-flechas button{
+  padding:.85rem;border-radius:10px;cursor:pointer;font-size:1.1rem;color:#FDF6F5;
+  border:1px solid rgba(252,143,143,.32);
+  background:linear-gradient(140deg,rgba(100,36,47,.55),rgba(180,68,70,.32));
+  transition:background .2s var(--ease);
+}
+.tel-flechas button:active{background:rgba(180,68,70,.6)}
+
 /* ---------- funciones ---------- */
 .rejilla{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:0}
 .fn{
@@ -450,6 +491,7 @@ footer{border-top:1px solid var(--linea-vino);padding:3.4rem 0 3rem;position:rel
     <nav class="nav">
       <a href="#consola">La consola</a>
       <a href="#funciones">Funciones</a>
+      <a href="#celular">Celular</a>
       <a href="#rvr1960">Biblias</a>
       <a href="#atajos">Atajos</a>
       <a href="#descargar">Descargar</a>
@@ -480,6 +522,7 @@ footer{border-top:1px solid var(--linea-vino);padding:3.4rem 0 3rem;position:rel
         <div class="datos sube sube-4">
           <span>Windows 10 y 11 · 64 bits</span>
           <span>No pide permisos de administrador</span>
+          <span>Se controla desde el celular</span>
           <span>No pide cuenta ni licencia</span>
           <span>Gratis</span>
         </div>
@@ -564,6 +607,62 @@ footer{border-top:1px solid var(--linea-vino);padding:3.4rem 0 3rem;position:rel
     </div>
   </section>
 
+  <!-- ============ CELULAR ============ -->
+  <section id="celular">
+    <div class="env">
+      <div class="celular-fila">
+        <div>
+          <p class="eyebrow">Novedad de la versión 1.1</p>
+          <h2>Y también desde el celular</h2>
+          <p class="suave medida" style="margin-top:1rem">
+            El operador no tiene por qué quedarse atado a la cabina. Enciendes el control remoto en
+            Configuración, escaneas un código QR con el teléfono, escribes un PIN de seis dígitos y ya
+            estás pasando diapositivas desde el fondo del salón.
+          </p>
+          <p class="suave medida" style="margin-top:.9rem">
+            Todo ocurre por la <b style="color:var(--lino)">red local de la iglesia</b>: sin internet, sin
+            cuentas y sin que nada salga a ninguna nube. Y <b style="color:var(--lino)">solo un teléfono a la
+            vez</b> — si entra otro, el primero pierde el mando en el acto y el escritorio lo avisa.
+          </p>
+          <div class="datos" style="margin-top:1.6rem">
+            <span>Botones de pánico</span>
+            <span>Saltar al coro o al final</span>
+            <span>Buscar y proyectar un versículo</span>
+            <span>Escribir un anuncio</span>
+          </div>
+          <p class="suave" style="font-size:.8rem;margin-top:1.4rem">
+            El teléfono de al lado está vivo: sus botones mueven la misma proyección de arriba.
+          </p>
+        </div>
+
+        <!-- Teléfono de demostración: refleja y controla el mismo estado que la consola. -->
+        <div class="telefono">
+          <div class="tel-barra"><i></i><b>Coraza</b></div>
+          <div class="tel-cuerpo">
+            <div class="tel-panico">
+              <button data-panico="negro" aria-pressed="false">NEGRO</button>
+              <button data-panico="logo" aria-pressed="false">LOGO</button>
+              <button data-panico="texto" aria-pressed="false">TEXTO</button>
+              <button data-panico="limpiar">LIMPIAR</button>
+            </div>
+            <div class="tel-tarjeta">
+              <p class="rotulo">En vivo</p>
+              <div class="tel-vivo" id="tel-vivo">—</div>
+            </div>
+            <div class="tel-tarjeta">
+              <p class="rotulo">Siguiente</p>
+              <div class="tel-sig" id="tel-sig">—</div>
+            </div>
+            <div class="tel-flechas">
+              <button id="tel-anterior" aria-label="Anterior">◀</button>
+              <button id="tel-siguiente" aria-label="Siguiente">▶</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ FUNCIONES ============ -->
   <section id="funciones">
     <div class="env">
@@ -610,6 +709,13 @@ footer{border-top:1px solid var(--linea-vino);padding:3.4rem 0 3rem;position:rel
           <h3>El orden del culto, listo desde el sábado</h3>
           <p>Arrastras las canciones y las lecturas a la lista, las reordenas y les pones notas para ti mismo. El domingo solo vas bajando.</p>
           <p class="detalle">Tiempo estimado · se guarda solo · puedes duplicar el servicio de la semana pasada.</p>
+        </article>
+
+        <article class="fn">
+          <span class="num">CELULAR</span>
+          <h3>Pasa diapositivas desde el teléfono</h3>
+          <p>Enciendes el control remoto, escaneas un QR, escribes un PIN y controlas el culto desde donde estés. Por la red local: sin internet ni cuentas.</p>
+          <p class="detalle">Botones de pánico · saltar al coro o al final · orden del servicio · buscar y proyectar un versículo eligiendo la versión · escribir un anuncio. Un solo teléfono a la vez.</p>
         </article>
 
         <article class="fn">
@@ -787,10 +893,9 @@ footer{border-top:1px solid var(--linea-vino);padding:3.4rem 0 3rem;position:rel
       </div>
       <div>
         <strong>Novedades</strong>
-        Ya puedes pasar diapositivas <strong>desde el celular</strong>: se enciende en Configuración, se
-        empareja escaneando un código QR y escribiendo un PIN, y solo admite un teléfono a la vez.
-        Todo por la red local de la iglesia, sin nube. Siguen en camino la pantalla de escenario,
-        la salida NDI y las alertas.
+        La versión 1.1 trae el control remoto desde el celular y el aviso de versiones nuevas, que se
+        descargan solas en segundo plano y nunca se instalan durante una proyección. Siguen en camino
+        la pantalla de escenario, la salida NDI y las alertas.
       </div>
     </div>
   </div>
@@ -953,12 +1058,33 @@ function proyectar(lineas, ref) {
   salida.dataset.logo = "0";
   salida.dataset.texto = "1";
   sincronizarPanico();
+
+  sincronizarTelefono(lineas);
+  // La vista previa se actualiza DESPUÉS de proyectar, así que el «siguiente» del
+  // teléfono se lee en el fotograma siguiente, cuando ya tiene el valor bueno.
+  requestAnimationFrame(() => sincronizarTelefono());
 }
 
 function sincronizarPanico() {
-  document.querySelector('[data-panico="negro"]').setAttribute("aria-pressed", salida.dataset.negro === "1");
-  document.querySelector('[data-panico="logo"]').setAttribute("aria-pressed", salida.dataset.logo === "1");
-  document.querySelector('[data-panico="texto"]').setAttribute("aria-pressed", salida.dataset.texto === "0");
+  // querySelectorAll, no querySelector: los mismos botones existen dos veces, en el
+  // panel del operador y en el teléfono de la demostración, y deben reflejar lo mismo.
+  const marcar = (clave, activo) =>
+    document.querySelectorAll(`[data-panico="${clave}"]`)
+      .forEach(b => b.setAttribute("aria-pressed", String(activo)));
+
+  marcar("negro", salida.dataset.negro === "1");
+  marcar("logo", salida.dataset.logo === "1");
+  marcar("texto", salida.dataset.texto === "0");
+}
+
+/** Refleja en el teléfono lo que se está proyectando. */
+function sincronizarTelefono(lineas) {
+  const vivo = document.getElementById("tel-vivo");
+  const sig = document.getElementById("tel-sig");
+  if (!vivo || !sig) return;
+  // Se quitan las etiquetas: el número de versículo viaja como <span> en el pasaje.
+  if (lineas) vivo.textContent = lineas.map(l => l.replace(/<[^>]*>/g, "")).join("\n");
+  sig.textContent = previaTexto.textContent;
 }
 
 /* ---------- canciones ---------- */
@@ -1150,6 +1276,10 @@ document.querySelectorAll("[data-panico]").forEach(b => {
     sincronizarPanico();
   };
 });
+
+/* ---------- flechas del teléfono: mueven la misma proyección ---------- */
+document.getElementById("tel-siguiente").onclick = () => mostrarDiapo(estado.indice + 1);
+document.getElementById("tel-anterior").onclick = () => mostrarDiapo(estado.indice - 1);
 
 /* ---------- teclado, solo cuando la consola está a la vista ---------- */
 addEventListener("keydown", e => {
