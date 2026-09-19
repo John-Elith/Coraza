@@ -53,6 +53,18 @@
                 <TextBlock Style="{StaticResource T.Suave}" TextWrapping="Wrap" TextTrimming="None" Margin="0,6,0,0"
                            Text="Pasa diapositivas desde el celular por la red local de la iglesia, sin internet y sin cuentas. Se autoriza con un PIN que aparece en esa ventana, y solo puede haber un teléfono conectado a la vez: si entra otro, el primero pierde el mando." />
 
+                <TextBlock Text="ACTUALIZACIONES" Style="{StaticResource Seccion}" />
+                <CheckBox Content="Avisarme cuando haya una versión nueva" IsChecked="{Binding ComprobarActualizaciones}" />
+                <DockPanel Margin="0,10,0,0">
+                    <Button DockPanel.Dock="Left" Content="Instalar ahora" Style="{StaticResource Boton.Primario}"
+                            Command="{Binding InstalarActualizacionCommand}" Margin="0,0,6,0" />
+                    <Button DockPanel.Dock="Left" Content="Omitir esta versión"
+                            Command="{Binding OmitirActualizacionCommand}" Margin="0,0,10,0" />
+                    <TextBlock Text="{Binding EstadoActualizacion}" Style="{StaticResource Rotulo}" />
+                </DockPanel>
+                <TextBlock Style="{StaticResource T.Suave}" TextWrapping="Wrap" TextTrimming="None" Margin="0,6,0,0"
+                           Text="Es lo único de Coraza que sale a internet, y se puede apagar aquí. La comprobación es como mucho una vez al día y la descarga ocurre sola, en segundo plano: no hay que buscar nada en ninguna página. Nunca se instala durante una proyección, y al instalar se cierra el programa sin tocar tus canciones, servicios ni respaldos." />
+
                 <TextBlock Text="PANTALLA DE LOGOTIPO" Style="{StaticResource Seccion}" />
                 <DockPanel>
                     <Button DockPanel.Dock="Left" Content="Elegir imagen…" Command="{Binding ElegirLogoCommand}" Margin="0,0,6,0" />

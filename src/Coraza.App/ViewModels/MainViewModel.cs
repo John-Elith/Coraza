@@ -91,6 +91,15 @@ public sealed partial class MainViewModel : ObservableObject
         Temas = new PanelTemasViewModel(this);
         Busqueda = new BusquedaUniversalViewModel(this);
         Remoto = new ServicioControlRemoto(this);
+        Actualizaciones = new Actualizador(this);
+
+        // Si hay una actualización lista y el culto estaba en marcha, el aviso se
+        // guardó para después: se ofrece en cuanto la proyección se detiene.
+        Proyeccion.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(ControladorProyeccion.Proyectando) && !Proyeccion.Proyectando)
+                Actualizaciones.Avisar();
+        };
 
         Transiciones = OpcionTransicion.Todas;
         _transicionSeleccionada = Transiciones.FirstOrDefault(t => t.Valor == ctx.Preferencias.TransicionForzada) ?? Transiciones[0];
@@ -147,6 +156,7 @@ public sealed partial class MainViewModel : ObservableObject
     public PanelTemasViewModel Temas { get; }
     public BusquedaUniversalViewModel Busqueda { get; }
     public ServicioControlRemoto Remoto { get; }
+    public Actualizador Actualizaciones { get; }
 
     public ObservableCollection<ElementoViewModel> Elementos { get; } = new();
     public ObservableCollection<DiapositivaViewModel> Diapositivas { get; } = new();
@@ -227,6 +237,10 @@ public sealed partial class MainViewModel : ObservableObject
         // Al final y aparte: si el control remoto no arranca, avisa y no pasa nada más.
         // La proyección no depende de él en ningún momento.
         Remoto.IniciarSiProcede();
+
+        // Sin esperar: la comprobación sale a internet y no puede retrasar el arranque
+        // ni un segundo. Si no hay red, no pasa absolutamente nada.
+        _ = Actualizaciones.ComprobarAsync();
     }
 
     /// <summary>

@@ -1,7 +1,11 @@
 # Coraza
 
 Software de proyección para iglesias: canciones, versículos bíblicos, textos e imágenes, del PC al Video Beam.
-Funciona **100 % sin internet**. Construido según el *Informe de Análisis y Diseño* (Fase 1 · MVP y Fase 2 · Experiencia).
+Funciona **100 % sin internet**. Construido según el *Informe de Análisis y Diseño* (Fase 1 · MVP, Fase 2 · Experiencia y Fase 3 · Novedades).
+
+> La única excepción es el aviso de versiones nuevas, que es opcional y se puede apagar en Configuración.
+> Apagado, Coraza no hace ni una sola petición a internet. El control remoto desde el celular tampoco
+> sale de la red local de la iglesia.
 
 > Inspirado en Efesios 6:14, la coraza de justicia. El programa protege el momento del culto: no falla, no distrae
 > y deja reaccionar al operador con rapidez.
@@ -68,6 +72,7 @@ Distribución sin internet (carpeta + ZIP autocontenidos):
 | Control remoto | Pasa diapositivas desde el celular por la **red local**, sin internet y sin cuentas. Se enciende en Configuración → Control remoto, que muestra un código QR y un PIN de 6 dígitos. Desde el teléfono: botones de pánico (negro, logo, ocultar texto, limpiar), avanzar y retroceder, saltar a una sección de la canción, recorrer el orden del servicio y **buscar** canciones o citas bíblicas para dejarlas en vista previa. |
 | Seguridad | **Un solo teléfono a la vez**: si entra otro, el primero pierde el mando en el acto y se ve en el escritorio. El PIN vive solo en memoria, se regenera al conceder y al revocar, y 5 intentos fallidos bloquean un minuto. Reiniciar Coraza revoca cualquier sesión. El tráfico va por HTTP plano dentro de la red local: **basta contra un curioso en la sala, no contra una red hostil.** |
 | Firewall | La ventana lee el estado sin pedir permisos y ofrece crear la regla con **una sola elevación**. Avisa cuando la red está en perfil «Público», donde la regla no se aplica, y muestra el comando de `netsh` por si hay que hacerlo a mano. |
+| Actualizaciones | Comprueba como mucho **una vez al día** si hay una versión nueva y **la descarga sola, en segundo plano**: no hay que buscar nada en ninguna página. Después avisa en la barra de mensajes y el operador decide cuándo instalarla. **Nunca durante una proyección**: ni se avisa ni se instala mientras el culto está en marcha, porque instalar cierra el programa. Se puede omitir una versión concreta o apagar el aviso por completo. Sin internet no pasa nada: no hay error, ni espera, ni retraso en el arranque. |
 
 ## Atajos principales
 

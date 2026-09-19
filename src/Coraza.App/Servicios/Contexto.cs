@@ -35,6 +35,21 @@ public sealed class Preferencias
     public Dictionary<string, string> Atajos { get; set; } = new();
     /// <summary>Control remoto desde el celular (Fase 3).</summary>
     public PreferenciasControlRemoto ControlRemoto { get; set; } = new();
+    /// <summary>Aviso de versiones nuevas.</summary>
+    public PreferenciasActualizacion Actualizaciones { get; set; } = new();
+}
+
+/// <summary>
+/// Ajustes del aviso de actualizaciones. Es lo ÚNICO de Coraza que sale a internet,
+/// así que se puede apagar y, apagado, el programa no hace ni una petición.
+/// </summary>
+public sealed class PreferenciasActualizacion
+{
+    public bool Comprobar { get; set; } = true;
+    /// <summary>Para no consultar más de una vez al día.</summary>
+    public DateTime? UltimaComprobacion { get; set; }
+    /// <summary>Versión que el operador decidió saltarse; no se vuelve a ofrecer.</summary>
+    public string? VersionOmitida { get; set; }
 }
 
 /// <summary>Ajustes del control remoto. Apagado por omisión: se enciende por servicio.</summary>

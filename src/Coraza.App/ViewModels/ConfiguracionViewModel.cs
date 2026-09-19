@@ -105,6 +105,47 @@ public sealed partial class ConfiguracionViewModel : ObservableObject
         ? $"Encendido · puerto {_main.Remoto.Puerto}"
         : "Apagado";
 
+    // ---- Actualizaciones ----
+    // Como la sección del control remoto, esta se aplica al momento y no espera al
+    // botón Guardar: «comprobar actualizaciones» no tiene sentido como cambio pendiente.
+
+    public bool ComprobarActualizaciones
+    {
+        get => _p.Actualizaciones.Comprobar;
+        set
+        {
+            if (_p.Actualizaciones.Comprobar == value) return;
+            _p.Actualizaciones.Comprobar = value;
+            _main.Ctx.GuardarPreferencias();
+            OnPropertyChanged();
+        }
+    }
+
+    public string EstadoActualizacion => _main.Actualizaciones.HayActualizacionLista
+        ? $"Lista para instalar: {_main.Actualizaciones.Disponible!.Nombre}"
+        : $"Estás en la versión {Actualizador.VersionActual.ToString(3)}";
+
+    public bool HayActualizacion => _main.Actualizaciones.HayActualizacionLista;
+
+    /// <summary>Instala la versión descargada. Se niega si hay una proyección activa.</summary>
+    [RelayCommand]
+    private void InstalarActualizacion()
+    {
+        // Aplicar cierra Coraza: hacerlo en pleno culto sería justo el desastre que
+        // este programa existe para evitar. Actualizador.Aplicar() lo comprueba.
+        if (_main.Actualizaciones.Aplicar()) CerrarSolicitado?.Invoke(false);
+        OnPropertyChanged(nameof(EstadoActualizacion));
+        OnPropertyChanged(nameof(HayActualizacion));
+    }
+
+    [RelayCommand]
+    private void OmitirActualizacion()
+    {
+        _main.Actualizaciones.Omitir();
+        OnPropertyChanged(nameof(EstadoActualizacion));
+        OnPropertyChanged(nameof(HayActualizacion));
+    }
+
     /// <summary>
     /// Abre la ventana del control remoto. No se guarda con el resto de la
     /// configuración: esa ventana aplica sus cambios al momento, porque encender el
