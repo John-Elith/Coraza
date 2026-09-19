@@ -1,5 +1,8 @@
 <title>Coraza</title>
 <meta name="description" content="Software de proyección para iglesias. Canciones, Biblia, textos e imágenes, del PC al Video Beam. Funciona 100 % sin internet.">
+<!-- El escudo de Coraza como SVG incrustado: nitido a cualquier tamano y sin pedir otro archivo.
+     Version simplificada del logo (sin las lineas finas, que a 16 px se empastan). -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='.5' y1='0' x2='.5' y2='1'%3E%3Cstop offset='0' stop-color='%23B44446'/%3E%3Cstop offset='1' stop-color='%2364242F'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M50,4 C62,10 76,13 90,14 C92,52 82,88 50,116 C18,88 8,52 10,14 C24,13 38,10 50,4 Z' fill='url(%23g)' stroke='%23FC8F8F' stroke-width='7' stroke-linejoin='round'/%3E%3Cpath d='M50,44 C52,53 54,55 62,57 C54,59 52,61 50,70 C48,61 46,59 38,57 C46,55 48,53 50,44 Z' fill='%23FC8F8F'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300&display=swap">
@@ -380,7 +383,10 @@ body.reduce .aviso-movimiento{display:block}
   transition:transform .45s var(--ease),border-color .45s var(--ease),background .45s var(--ease);
 }
 .paquete:hover{transform:translateY(-5px);border-color:rgba(252,143,143,.3);background:linear-gradient(160deg,rgba(35,27,30,.78),rgba(11,9,9,.6))}
-.paquete .btn{margin-top:.6rem;align-self:flex-start}
+/* margin-top:auto empuja el boton al fondo de la tarjeta: las dos celdas de la
+   cuadricula ya miden igual, asi que los botones quedan alineados aunque un
+   texto ocupe una linea mas que el otro. */
+.paquete .btn{margin-top:auto;align-self:flex-start}
 .paquete p{color:var(--humo);font-size:.9rem}
 
 .pasos{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.6rem;counter-reset:p}
