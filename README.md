@@ -6,8 +6,8 @@ Funciona **100 % sin internet**. Construido según el *Informe de Análisis y Di
 > Inspirado en Efesios 6:14, la coraza de justicia. El programa protege el momento del culto: no falla, no distrae
 > y deja reaccionar al operador con rapidez.
 
-**Página del proyecto:** <https://john-elith.github.io/Coraza/>
-**Descargar la última versión:** [Releases](https://github.com/John-Elith/Coraza/releases/latest) — ZIP normal y ZIP portátil para memoria USB.
+- **Página del proyecto:** <https://john-elith.github.io/Coraza/>
+- **Descargar la última versión:** [Releases](https://github.com/John-Elith/Coraza/releases/latest) — ZIP normal y ZIP portátil para memoria USB.
 
 ## Requisitos
 
