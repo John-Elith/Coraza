@@ -467,13 +467,13 @@ footer{border-top:1px solid var(--linea-vino);padding:3.4rem 0 3rem;position:rel
         </p>
         <div class="acciones sube sube-4">
           <a class="btn btn-fuerte" id="descarga-principal" href="#descargar">
-            Descargar para Windows <span class="peso">ZIP · 82 MB</span>
+            Descargar para Windows <span class="peso">Instalador · 61 MB</span>
           </a>
           <a class="btn" href="#consola">Ver cómo funciona</a>
         </div>
         <div class="datos sube sube-4">
           <span>Windows 10 y 11 · 64 bits</span>
-          <span>No se instala: se descomprime y se abre</span>
+          <span>No pide permisos de administrador</span>
           <span>No pide cuenta ni licencia</span>
           <span>Gratis</span>
         </div>
@@ -699,9 +699,9 @@ footer{border-top:1px solid var(--linea-vino);padding:3.4rem 0 3rem;position:rel
           <p>La versión portátil guarda el programa y tus datos en la misma carpeta. Llegas con la USB, la conectas y proyectas con tus propias canciones.</p>
         </div>
         <div class="cristal">
-          <p class="rotulo">Sin instalar</p>
-          <h3>Descomprimir y abrir</h3>
-          <p>Trae adentro todo lo que necesita para funcionar. En el computador de la iglesia no hay que instalar nada más ni pedirle la contraseña a nadie.</p>
+          <p class="rotulo">Sin permisos</p>
+          <h3>No hace falta ser administrador</h3>
+          <p>Trae adentro todo lo que necesita para funcionar, así que el instalador no pide la contraseña de administrador ni depende de que instales nada más en el equipo.</p>
         </div>
       </div>
     </div>
@@ -713,15 +713,15 @@ footer{border-top:1px solid var(--linea-vino);padding:3.4rem 0 3rem;position:rel
       <div class="cabeza">
         <p class="eyebrow">Descargar</p>
         <h2>Pruébalo antes del próximo domingo</h2>
-        <p class="suave medida">Los dos paquetes traen el programa completo. Lo único que cambia es dónde quedan guardados tus datos.</p>
+        <p class="suave medida">Los dos traen el programa completo. El instalador es el camino corto si vas a usar siempre el mismo computador; el portátil, si te toca ir rotando de equipo.</p>
       </div>
 
       <div class="descarga">
         <article class="paquete cristal">
           <p class="rotulo">Recomendado</p>
-          <h3>Coraza para Windows</h3>
-          <p>Para el computador de la iglesia. Tus datos quedan en <code style="font-family:var(--f-mono);font-size:.82rem">Documentos\Coraza</code> y se respaldan solos todos los días.</p>
-          <a class="btn btn-fuerte" id="enlace-normal" href="#">Descargar ZIP <span class="peso">82 MB</span></a>
+          <h3>Instalador para Windows</h3>
+          <p>Un solo archivo: doble clic, siguiente, listo. Deja el icono en el Escritorio y su desinstalador. Tus datos quedan en <code style="font-family:var(--f-mono);font-size:.82rem">Documentos\Coraza</code> y se respaldan solos todos los días.</p>
+          <a class="btn btn-fuerte" id="enlace-normal" href="#">Descargar instalador <span class="peso">61 MB</span></a>
         </article>
 
         <article class="paquete cristal">
@@ -735,18 +735,18 @@ footer{border-top:1px solid var(--linea-vino);padding:3.4rem 0 3rem;position:rel
       <div class="pasos">
         <div class="paso">
           <span class="n">PASO 01</span>
-          <h3>Descomprime</h3>
-          <p>Clic derecho sobre el ZIP y <em>Extraer todo</em>. Saca la carpeta antes de abrirla: desde adentro del ZIP, Windows no lo ejecuta bien.</p>
+          <h3>Doble clic en el instalador</h3>
+          <p>El archivo que descargaste se llama <code>CorazaInstalador.exe</code>. No pide contraseña de administrador, así que no verás la ventana azul de Windows pidiendo permisos.</p>
         </div>
         <div class="paso">
           <span class="n">PASO 02</span>
-          <h3>Abre <code>Coraza.exe</code></h3>
-          <p>La primera vez Windows avisa que no reconoce el programa. Le pasa a todo lo que no está firmado: <em>Más información → Ejecutar de todas formas</em>.</p>
+          <h3>Windows te va a advertir</h3>
+          <p>Dirá que no reconoce el programa. Le pasa a todo lo que no tiene una firma digital de pago: pulsa <em>Más información</em> y luego <em>Ejecutar de todas formas</em>.</p>
         </div>
         <div class="paso">
           <span class="n">PASO 03</span>
-          <h3>Sigue el asistente</h3>
-          <p>Te pregunta el nombre de la iglesia, cuál de las pantallas es el Video Beam, el tema y la versión bíblica. En dos minutos queda listo.</p>
+          <h3>Siguiente, Instalar, Finalizar</h3>
+          <p>Queda el icono en el Escritorio. Al abrirlo, Coraza te pregunta el nombre de la iglesia, cuál pantalla es el Video Beam, el tema y la versión bíblica. En dos minutos estás proyectando.</p>
         </div>
       </div>
     </div>
@@ -792,11 +792,13 @@ footer{border-top:1px solid var(--linea-vino);padding:3.4rem 0 3rem;position:rel
 /* ==========================================================================
    ENLACES DE DESCARGA
    Apuntan a la última Release del repositorio. Gracias a /latest/download/
-   el enlace sigue sirviendo cuando publiques una versión nueva: subes los
-   ZIP a la Release y esta página no se toca.
+   el enlace sigue sirviendo cuando publiques una versión nueva: subes el
+   instalador y el ZIP portátil a la Release, y esta página no se toca.
+   Los nombres de archivo deben coincidir EXACTAMENTE con los de abajo; si
+   cambian, los botones dan 404 y la página se sigue viendo bien.
    ========================================================================== */
 const DESCARGAS = {
-  normal:   "https://github.com/John-Elith/Coraza/releases/latest/download/Coraza-win-x64.zip",
+  normal:   "https://github.com/John-Elith/Coraza/releases/latest/download/CorazaInstalador.exe",
   portatil: "https://github.com/John-Elith/Coraza/releases/latest/download/Coraza-win-x64-portatil.zip"
 };
 
