@@ -6,6 +6,9 @@ Funciona **100 % sin internet**. Construido según el *Informe de Análisis y Di
 > Inspirado en Efesios 6:14, la coraza de justicia. El programa protege el momento del culto: no falla, no distrae
 > y deja reaccionar al operador con rapidez.
 
+**Página del proyecto:** <https://john-elith.github.io/Coraza/>
+**Descargar la última versión:** [Releases](https://github.com/John-Elith/Coraza/releases/latest) — ZIP normal y ZIP portátil para memoria USB.
+
 ## Requisitos
 
 - Windows 10 (21H2) u 11 de 64 bits.
@@ -80,7 +83,12 @@ Coraza.sln
   src/Coraza.Rendering   motor de proyección, transiciones, auto-ajuste, patrón de prueba
   src/Coraza.App         WPF: ventanas, MVVM, estilos, pantallas, atajos
   tests/Coraza.Tests     pruebas unitarias y de integración
+  docs/index.html        página pública; GitHub Pages sirve esta carpeta (rama main, /docs)
 ```
+
+La página es un único archivo autocontenido. Sus botones de descarga apuntan a
+`releases/latest/download/Coraza-win-x64.zip` y `...-portatil.zip`, que son los nombres exactos que
+genera `publicar.ps1`: si se renombra un ZIP, los botones dan 404 aunque la página se siga viendo bien.
 
 Datos del usuario: `Documentos\Coraza\` (Biblioteca, Medios, Fuentes, Temas, Servicios, Respaldos, Registros).
 Si junto al ejecutable existe `portable.txt`, todo se guarda en la carpeta `Datos` (versión portátil).
