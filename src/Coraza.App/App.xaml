@@ -1,0 +1,15 @@
+<Application x:Class="Coraza.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Estilos/Colores.xaml" />
+                <ResourceDictionary Source="Estilos/Iconos.xaml" />
+                <ResourceDictionary Source="Estilos/Controles.xaml" />
+                <ResourceDictionary Source="Estilos/Conversores.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

@@ -1,0 +1,44 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Paleta Coraza -->
+    <Color x:Key="C.Vino">#64242F</Color>
+    <Color x:Key="C.Teja">#B44446</Color>
+    <Color x:Key="C.Coral">#FC8F8F</Color>
+    <Color x:Key="C.Lino">#DFD9D8</Color>
+
+    <!-- Tonos derivados (modo oscuro, predeterminado para auditorios con poca luz) -->
+    <Color x:Key="C.Fondo">#1E0B0F</Color>
+    <Color x:Key="C.Panel">#2A1216</Color>
+    <Color x:Key="C.PanelAlto">#3A1820</Color>
+    <Color x:Key="C.Borde">#4D2630</Color>
+    <Color x:Key="C.Entrada">#170809</Color>
+    <Color x:Key="C.Texto">#DFD9D8</Color>
+    <Color x:Key="C.TextoSuave">#A99597</Color>
+    <Color x:Key="C.Exito">#4E8F6A</Color>
+    <Color x:Key="C.Advertencia">#D9A441</Color>
+
+    <SolidColorBrush x:Key="B.Vino" Color="{StaticResource C.Vino}" />
+    <SolidColorBrush x:Key="B.Teja" Color="{StaticResource C.Teja}" />
+    <SolidColorBrush x:Key="B.Coral" Color="{StaticResource C.Coral}" />
+    <SolidColorBrush x:Key="B.Lino" Color="{StaticResource C.Lino}" />
+    <SolidColorBrush x:Key="B.Fondo" Color="{StaticResource C.Fondo}" />
+    <SolidColorBrush x:Key="B.Panel" Color="{StaticResource C.Panel}" />
+    <SolidColorBrush x:Key="B.PanelAlto" Color="{StaticResource C.PanelAlto}" />
+    <SolidColorBrush x:Key="B.Borde" Color="{StaticResource C.Borde}" />
+    <SolidColorBrush x:Key="B.Entrada" Color="{StaticResource C.Entrada}" />
+    <SolidColorBrush x:Key="B.Texto" Color="{StaticResource C.Texto}" />
+    <SolidColorBrush x:Key="B.TextoSuave" Color="{StaticResource C.TextoSuave}" />
+    <SolidColorBrush x:Key="B.Exito" Color="{StaticResource C.Exito}" />
+    <SolidColorBrush x:Key="B.Advertencia" Color="{StaticResource C.Advertencia}" />
+    <SolidColorBrush x:Key="B.Hover" Color="#1FFC8F8F" />
+    <SolidColorBrush x:Key="B.Seleccion" Color="#66B44446" />
+    <SolidColorBrush x:Key="B.Velo" Color="#B3100507" />
+    <SolidColorBrush x:Key="B.BordeHover" Color="#6E3440" />
+    <SolidColorBrush x:Key="B.Barra" Color="{StaticResource C.Vino}" />
+    <SolidColorBrush x:Key="B.LibroNT" Color="#4A1F28" />
+    <!-- Texto sobre el color de acento (B.Coral) y mensajes de estado; cambian con la paleta. -->
+    <SolidColorBrush x:Key="B.SobreAcento" Color="{StaticResource C.Vino}" />
+    <SolidColorBrush x:Key="B.Estado" Color="#8FD1A9" />
+
+</ResourceDictionary>

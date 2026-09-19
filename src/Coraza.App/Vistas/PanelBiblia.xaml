@@ -1,0 +1,165 @@
+<UserControl x:Class="Coraza.App.Vistas.PanelBiblia"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:Coraza.App.Controles"
+             xmlns:vm="clr-namespace:Coraza.App.ViewModels"
+             xmlns:m="clr-namespace:Coraza.Core.Modelos;assembly=Coraza.Core"
+             Foreground="{DynamicResource B.Texto}">
+    <UserControl.Resources>
+        <Style x:Key="BotonLibro" TargetType="Button" BasedOn="{StaticResource BotonBase}">
+            <Setter Property="Width" Value="41" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="FontSize" Value="11.5" />
+        </Style>
+    </UserControl.Resources>
+    <DockPanel>
+        <Grid DockPanel.Dock="Top" Margin="0,0,0,6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ListBox ItemsSource="{Binding Versiones}" SelectedItem="{Binding Version}" ItemContainerStyle="{StaticResource Item.Chip}"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" VerticalAlignment="Center"
+                     ToolTip="Versión de la Biblia: haz clic para cambiar">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type m:VersionBiblia}">
+                        <TextBlock Text="{Binding Abreviatura}" FontWeight="SemiBold" FontSize="12" ToolTip="{Binding Nombre}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Button Grid.Column="1" Style="{StaticResource Boton.Icono}" Command="{Binding ImportarCommand}" Margin="4,0,0,0"
+                    ToolTip="Importar otra versión de la que tengas licencia (e-Sword, MySword, MyBible, Zefania, OSIS, USFM o VPL)">
+                <c:Icono Datos="{StaticResource Ico.Importar}" />
+            </Button>
+            <Button Grid.Column="2" Style="{StaticResource Boton.Icono}" Command="{Binding EliminarVersionCommand}" ToolTip="Eliminar esta versión">
+                <c:Icono Datos="{StaticResource Ico.Papelera}" />
+            </Button>
+        </Grid>
+        <Grid DockPanel.Dock="Top">
+            <TextBox x:Name="Cita" Text="{Binding Consulta, UpdateSourceTrigger=PropertyChanged}" FontSize="14" Padding="32,7,8,7"
+                     Tag="jn 3 16 · Sal 23 · o palabras" PreviewKeyDown="Cita_PreviewKeyDown" />
+            <c:Icono Datos="{StaticResource Ico.Biblia}" Width="15" Height="15" Margin="10,0,0,0" HorizontalAlignment="Left"
+                     Foreground="{DynamicResource B.Coral}" IsHitTestVisible="False" />
+        </Grid>
+        <DockPanel DockPanel.Dock="Top" Margin="0,6,0,6">
+            <Button DockPanel.Dock="Left" Style="{StaticResource Boton.Icono}" Padding="4" Margin="0,0,4,0" Command="{Binding VolverCommand}"
+                    Visibility="{Binding PuedeVolver, Converter={StaticResource BoolVis}}" ToolTip="Volver">
+                <c:Icono Datos="{StaticResource Ico.Izquierda}" Width="14" Height="14" />
+            </Button>
+            <TextBlock Text="{Binding Estado}" Style="{StaticResource T.Suave}" TextWrapping="Wrap" TextTrimming="None" VerticalAlignment="Center" />
+        </DockPanel>
+        <UniformGrid DockPanel.Dock="Bottom" Columns="2" Margin="0,6,0,0">
+            <Button x:Name="BotonMostrar" Style="{StaticResource Boton.Primario}" Command="{Binding MostrarCommand}" Margin="0,0,3,0" ToolTip="Mostrar en la vista previa (Enter)">
+                <StackPanel Orientation="Horizontal">
+                    <c:Icono Datos="{StaticResource Ico.Monitor}" Width="14" Height="14" />
+                    <TextBlock Text="Mostrar" Margin="6,0,0,0" />
+                </StackPanel>
+            </Button>
+            <Button Command="{Binding AgregarAlServicioCommand}" Margin="3,0,0,0" ToolTip="Agregar el pasaje al orden del servicio">
+                <StackPanel Orientation="Horizontal">
+                    <c:Icono Datos="{StaticResource Ico.Mas}" Width="13" Height="13" />
+                    <TextBlock Text="Servicio" Margin="6,0,0,0" />
+                </StackPanel>
+            </Button>
+        </UniformGrid>
+
+        <Grid>
+            <!-- Libros -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding Modo, Converter={StaticResource IgualVis}, ConverterParameter=Libros}">
+                <StackPanel>
+                    <TextBlock Text="ANTIGUO TESTAMENTO" Style="{StaticResource T.Seccion}" Margin="2,0,0,4" />
+                    <ItemsControl ItemsSource="{Binding LibrosAT}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type vm:LibroOpcion}">
+                                <Button Style="{StaticResource BotonLibro}" Content="{Binding Corto}" ToolTip="{Binding Nombre}" IsEnabled="{Binding Disponible}"
+                                        Command="{Binding DataContext.ElegirLibroCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock Text="NUEVO TESTAMENTO" Style="{StaticResource T.Seccion}" Margin="2,10,0,4" />
+                    <ItemsControl ItemsSource="{Binding LibrosNT}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type vm:LibroOpcion}">
+                                <Button Style="{StaticResource BotonLibro}" Content="{Binding Corto}" ToolTip="{Binding Nombre}" IsEnabled="{Binding Disponible}"
+                                        Background="{DynamicResource B.LibroNT}" Foreground="{DynamicResource B.Coral}"
+                                        Command="{Binding DataContext.ElegirLibroCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Capítulos -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding Modo, Converter={StaticResource IgualVis}, ConverterParameter=Capitulos}">
+                <ItemsControl ItemsSource="{Binding Capitulos}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Style="{StaticResource BotonLibro}" Height="32" Content="{Binding}"
+                                    Command="{Binding DataContext.ElegirCapituloCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- Pasaje -->
+            <ListBox x:Name="ListaVersiculos" ItemsSource="{Binding Versiculos}" SelectionMode="Extended"
+                     Visibility="{Binding Modo, Converter={StaticResource IgualVis}, ConverterParameter=Pasaje}"
+                     SelectionChanged="ListaVersiculos_SelectionChanged" MouseDoubleClick="ListaVersiculos_MouseDoubleClick"
+                     ToolTip="Selecciona versículos (Mayús/Ctrl + clic) para proyectar solo una parte" ToolTipService.InitialShowDelay="1500">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type m:Versiculo}">
+                        <TextBlock TextWrapping="Wrap" FontSize="12.5">
+                            <Run Text="{Binding Numero, Mode=OneWay}" Foreground="{DynamicResource B.Coral}" FontWeight="Bold" />
+                            <Run Text="{Binding Texto, Mode=OneWay}" />
+                        </TextBlock>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <!-- Resultados de búsqueda -->
+            <DockPanel Visibility="{Binding Modo, Converter={StaticResource IgualVis}, ConverterParameter=Resultados}">
+                <ComboBox DockPanel.Dock="Top" ItemsSource="{Binding FiltrosTestamento}" SelectedIndex="{Binding FiltroTestamento}" Margin="0,0,0,6" />
+                <ListBox x:Name="ListaResultados" ItemsSource="{Binding Resultados}" PreviewMouseLeftButtonUp="ListaResultados_Click">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type m:Versiculo}">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Referencia}" Foreground="{DynamicResource B.Coral}" FontWeight="SemiBold" FontSize="12" />
+                                <TextBlock Text="{Binding Texto}" TextWrapping="Wrap" FontSize="12.5" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+
+            <!-- Sin Biblias -->
+            <StackPanel VerticalAlignment="Center" Margin="12" Visibility="{Binding SinBiblias, Converter={StaticResource BoolVis}}">
+                <c:Icono Datos="{StaticResource Ico.Biblia}" Width="40" Height="40" Foreground="{DynamicResource B.Borde}" />
+                <TextBlock Text="No hay Biblias instaladas" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,10,0,4" />
+                <TextBlock Text="Importa una versión en formato Zefania XML o VPL." TextWrapping="Wrap" TextAlignment="Center" Style="{StaticResource T.Suave}" />
+            </StackPanel>
+        </Grid>
+    </DockPanel>
+</UserControl>

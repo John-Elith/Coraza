@@ -1,0 +1,8 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:i="clr-namespace:Coraza.App.Infraestructura">
+    <i:BoolAVisibilidad x:Key="BoolVis" />
+    <i:VacioAVisibilidad x:Key="VacioVis" />
+    <i:HexAPincel x:Key="HexPincel" />
+    <i:IgualAVisibilidad x:Key="IgualVis" />
+</ResourceDictionary>

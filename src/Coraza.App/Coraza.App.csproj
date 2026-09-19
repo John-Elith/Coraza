@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <!-- Windows 10 2004+ para usar el motor PDF integrado de Windows (Windows.Data.Pdf). -->
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>Coraza.App</RootNamespace>
+    <AssemblyName>Coraza</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Recursos\coraza.ico</ApplicationIcon>
+    <AssemblyTitle>Coraza · Proyección para iglesias</AssemblyTitle>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+    <PackageReference Include="Serilog" Version="4.2.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Coraza.Core\Coraza.Core.csproj" />
+    <ProjectReference Include="..\Coraza.Data\Coraza.Data.csproj" />
+    <ProjectReference Include="..\Coraza.Rendering\Coraza.Rendering.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Recursos\Biblias\*.*" CopyToOutputDirectory="PreserveNewest" />
+    <Resource Include="Recursos\coraza.ico" />
+    <Resource Include="Recursos\coraza.png" />
+  </ItemGroup>
+
+</Project>

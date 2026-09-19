@@ -1,0 +1,196 @@
+<Window x:Class="Coraza.App.Vistas.EditorCancionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="clr-namespace:Coraza.App.Controles"
+        xmlns:vm="clr-namespace:Coraza.App.ViewModels"
+        xmlns:r="clr-namespace:Coraza.Rendering;assembly=Coraza.Rendering"
+        Title="{Binding TituloVentana}" Width="1120" Height="720" MinWidth="880" MinHeight="560" ResizeMode="CanResize">
+    <Window.InputBindings>
+        <KeyBinding Gesture="Ctrl+S" Command="{Binding GuardarCommand}" />
+    </Window.InputBindings>
+    <Window.Resources>
+        <Style x:Key="Etiqueta" TargetType="TextBlock" BasedOn="{StaticResource T.Seccion}">
+            <Setter Property="Margin" Value="2,0,0,4" />
+        </Style>
+        <Style x:Key="BotonSeccion" TargetType="Button" BasedOn="{StaticResource BotonBase}">
+            <Setter Property="Padding" Value="8,3" />
+            <Setter Property="Margin" Value="0,0,4,0" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="16" />
+            <ColumnDefinition Width="320" />
+        </Grid.ColumnDefinitions>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="TÍTULO" Style="{StaticResource Etiqueta}" />
+                    <TextBox x:Name="CajaTitulo" Text="{Binding Titulo, UpdateSourceTrigger=PropertyChanged}" FontSize="15" FontWeight="SemiBold" Tag="Nombre de la canción" />
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="AUTOR" Style="{StaticResource Etiqueta}" />
+                    <TextBox Text="{Binding Autor, UpdateSourceTrigger=PropertyChanged}" FontSize="14" Tag="Autor o compositor" />
+                </StackPanel>
+            </Grid>
+
+            <UniformGrid Grid.Row="1" Columns="4" Margin="0,10,0,0">
+                <StackPanel Margin="0,0,8,0">
+                    <TextBlock Text="TONALIDAD" Style="{StaticResource Etiqueta}" />
+                    <TextBox Text="{Binding Tonalidad}" Tag="p. ej. Sol" />
+                </StackPanel>
+                <StackPanel Margin="0,0,8,0">
+                    <TextBlock Text="TEMPO (BPM)" Style="{StaticResource Etiqueta}" />
+                    <TextBox Text="{Binding Tempo}" Tag="p. ej. 72" />
+                </StackPanel>
+                <StackPanel Margin="0,0,8,0">
+                    <TextBlock Text="Nº CCLI" Style="{StaticResource Etiqueta}" />
+                    <TextBox Text="{Binding Ccli}" Tag="Número de la canción" />
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock Text="CATEGORÍA" Style="{StaticResource Etiqueta}" />
+                    <ComboBox ItemsSource="{Binding Categorias}" SelectedItem="{Binding Categoria}" />
+                </StackPanel>
+            </UniformGrid>
+
+            <Grid Grid.Row="2" Margin="0,10,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="DERECHOS DE AUTOR" Style="{StaticResource Etiqueta}" />
+                    <TextBox Text="{Binding Derechos}" Tag="© año editorial (se muestra al final de la canción)" />
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="ETIQUETAS" Style="{StaticResource Etiqueta}" />
+                    <TextBox Text="{Binding Etiquetas}" Tag="jóvenes, navidad, rápida…" />
+                </StackPanel>
+            </Grid>
+
+            <DockPanel Grid.Row="3" Margin="0,14,0,6">
+                <TextBlock Text="LETRA" Style="{StaticResource T.Seccion}" VerticalAlignment="Center" Margin="2,0,12,0" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Insertar:" Style="{StaticResource T.Suave}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                    <Button Style="{StaticResource BotonSeccion}" Content="Verso" Tag="Verso" Click="InsertarEtiqueta_Click" />
+                    <Button Style="{StaticResource BotonSeccion}" Content="Pre-coro" Tag="Pre-coro" Click="InsertarEtiqueta_Click" />
+                    <Button Style="{StaticResource BotonSeccion}" Content="Coro" Tag="Coro" Click="InsertarEtiqueta_Click" />
+                    <Button Style="{StaticResource BotonSeccion}" Content="Puente" Tag="Puente" Click="InsertarEtiqueta_Click" />
+                    <Button Style="{StaticResource BotonSeccion}" Content="Final" Tag="Final" Click="InsertarEtiqueta_Click" />
+                    <Button Style="{StaticResource BotonSeccion}" Content="---" Tag="---" Click="InsertarEtiqueta_Click" ToolTip="Forzar cambio de diapositiva" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Style="{StaticResource Boton.Icono}" Command="{Binding PegarDelPortapapelesCommand}" ToolTip="Pegar letra copiada de una página web (se limpia el formato)">
+                        <c:Icono Datos="{StaticResource Ico.Pegar}" />
+                    </Button>
+                    <Button Style="{StaticResource Boton.Icono}" Command="{Binding LimpiarLetraCommand}" ToolTip="Limpiar formato: acordes, espacios y marcas de repetición">
+                        <c:Icono Datos="{StaticResource Ico.Deshacer}" />
+                    </Button>
+                    <Button Command="{Binding EtiquetarCommand}" Padding="8,3" ToolTip="Asistente: detecta coros repetidos, separa estrofas y propone el orden">
+                        <StackPanel Orientation="Horizontal">
+                            <c:Icono Datos="{StaticResource Ico.Varita}" Width="14" Height="14" />
+                            <TextBlock Text="Etiquetar" Margin="5,0,0,0" FontSize="12" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </DockPanel>
+
+            <TextBox x:Name="CajaLetra" Grid.Row="4" Text="{Binding Letra, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" AcceptsTab="False"
+                     TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Top" FontSize="14" Padding="10,8"
+                     Tag="Escribe cada sección una vez con su etiqueta: [Verso 1], [Coro], [Puente]…" />
+
+            <StackPanel Grid.Row="5" Margin="0,10,0,0">
+                <DockPanel>
+                    <TextBlock Text="ORDEN" Style="{StaticResource T.Seccion}" VerticalAlignment="Center" Margin="2,0,10,0" />
+                    <Button DockPanel.Dock="Right" Command="{Binding ProponerOrdenCommand}" Padding="8,4" Margin="8,0,0,0"
+                            ToolTip="Coro después de cada verso y del puente">
+                        <StackPanel Orientation="Horizontal">
+                            <c:Icono Datos="{StaticResource Ico.Varita}" Width="14" Height="14" />
+                            <TextBlock Text="Proponer orden" Margin="5,0,0,0" FontSize="12" />
+                        </StackPanel>
+                    </Button>
+                    <TextBox Text="{Binding Orden, UpdateSourceTrigger=PropertyChanged}" FontFamily="Consolas" FontSize="14"
+                             Tag="Vacío = como está escrito. Ejemplo: V1 C V2 C P C C" />
+                </DockPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                    <TextBlock Text="Agregar al orden:" Style="{StaticResource T.Suave}" VerticalAlignment="Center" Margin="2,0,6,0" />
+                    <ItemsControl ItemsSource="{Binding Codigos}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Content="{Binding}" Style="{StaticResource BotonSeccion}" FontWeight="SemiBold" FontFamily="Consolas"
+                                        Command="{Binding DataContext.AgregarAlOrdenCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+                <TextBlock Text="{Binding AvisoOrden}" Foreground="{DynamicResource B.Advertencia}" Margin="2,4,0,0"
+                           Visibility="{Binding AvisoOrden, Converter={StaticResource VacioVis}}" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="6" Margin="0,8,0,0">
+                <TextBlock Text="{Binding Resumen}" Style="{StaticResource T.Suave}" TextWrapping="Wrap" TextTrimming="None" />
+                <TextBlock Text="{Binding Error}" Foreground="{DynamicResource B.Coral}" FontWeight="SemiBold" Margin="0,4,0,0"
+                           Visibility="{Binding Error, Converter={StaticResource VacioVis}}" />
+            </StackPanel>
+
+            <DockPanel Grid.Row="7" Margin="0,12,0,0">
+                <StackPanel Orientation="Horizontal" Visibility="{Binding TieneVersiones, Converter={StaticResource BoolVis}}">
+                    <TextBlock Text="Versiones anteriores" Style="{StaticResource T.Suave}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <ComboBox Width="230" ItemsSource="{Binding Versiones}" SelectedItem="{Binding VersionElegida}" DisplayMemberPath="Descripcion" />
+                    <Button Content="Restaurar" Margin="6,0,0,0" Command="{Binding RestaurarVersionCommand}" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Cancelar" MinWidth="100" IsCancel="True" Command="{Binding CancelarCommand}" Margin="0,0,8,0" />
+                    <Button x:Name="BotonGuardar" Content="Guardar (Ctrl + S)" MinWidth="140" Style="{StaticResource Boton.Primario}" Command="{Binding GuardarCommand}" />
+                </StackPanel>
+            </DockPanel>
+        </Grid>
+
+        <DockPanel Grid.Column="2">
+            <TextBlock DockPanel.Dock="Top" Text="VISTA PREVIA" Style="{StaticResource T.Seccion}" Margin="2,0,0,6" />
+            <ComboBox DockPanel.Dock="Top" ItemsSource="{Binding OpcionesTema}" SelectedItem="{Binding TemaElegido}" DisplayMemberPath="Nombre"
+                      Margin="0,0,0,8" ToolTip="Tema de esta canción" />
+            <ListBox ItemsSource="{Binding Vista}" ItemContainerStyle="{StaticResource Item.Tarjeta}" HorizontalContentAlignment="Stretch">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:DiapositivaViewModel}">
+                        <StackPanel>
+                            <Border CornerRadius="4" ClipToBounds="True" Background="Black">
+                                <Viewbox Stretch="Uniform">
+                                    <r:LienzoDiapositiva Width="1920" Height="1080" Miniatura="True" Tema="{Binding Tema}" Diapositiva="{Binding Diapositiva}" />
+                                </Viewbox>
+                            </Border>
+                            <TextBlock Text="{Binding Etiqueta}" FontSize="12" FontWeight="SemiBold" Margin="2,4,0,1"
+                                       Foreground="{Binding ColorEtiqueta, Converter={StaticResource HexPincel}}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+    </Grid>
+</Window>

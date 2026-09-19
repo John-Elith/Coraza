@@ -1,0 +1,1156 @@
+<title>Coraza</title>
+<meta name="description" content="Software de proyección para iglesias. Canciones, Biblia, textos e imágenes, del PC al Video Beam. Funciona 100 % sin internet.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300&display=swap">
+
+<style>
+/* ============================================================
+   CORAZA · sitio
+   Mundo visual único y oscuro: la proyección ocurre a oscuras.
+   Todo color se pinta explícitamente; nada se hereda del host.
+   ============================================================ */
+
+:root{
+  /* Paleta tomada de src/Coraza.App/Estilos/Colores.xaml */
+  --tinta:#0B0909;      /* negro con un sesgo cálido mínimo */
+  --carbon:#151112;     /* panel */
+  --carbon-alto:#1D1719;
+  --vino:#64242F;
+  --teja:#B44446;
+  --coral:#FC8F8F;
+  --lino:#DFD9D8;
+  --humo:#8B7E80;       /* gris cálido, no gris puro */
+  --linea:rgba(223,217,216,.11);
+  --linea-vino:rgba(100,36,47,.55);
+
+  --f-display:"Newsreader",Georgia,"Times New Roman",serif;
+  --f-texto:"Archivo","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+
+  --ancho:1120px;
+  --r:14px;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+
+*{box-sizing:border-box}
+
+/* Los enlaces de la barra bajan suave hasta su sección, sin quedar tapados por ella. */
+html{scroll-behavior:smooth}
+section,#inicio{scroll-margin-top:88px}
+
+body{
+  margin:0;
+  background:var(--tinta);
+  color:var(--lino);
+  font-family:var(--f-texto);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+/* Lavado de vino: una sola mancha suave, no un fondo rojo */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(900px 620px at 78% -8%, rgba(100,36,47,.40), transparent 62%),
+    radial-gradient(700px 520px at 6% 34%, rgba(100,36,47,.18), transparent 60%),
+    radial-gradient(1000px 700px at 50% 108%, rgba(180,68,70,.10), transparent 62%);
+}
+
+/* Granulado */
+body::after{
+  content:"";position:fixed;inset:0;z-index:60;pointer-events:none;
+  opacity:.32;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+}
+
+.env{position:relative;z-index:1;width:min(100% - 44px,var(--ancho));margin-inline:auto}
+
+/* ---------- tipografía ---------- */
+h1,h2,h3{font-family:var(--f-display);font-weight:400;margin:0;text-wrap:balance;letter-spacing:-.015em}
+h1{font-size:clamp(2.4rem,5.4vw,3.9rem);line-height:1.08;font-weight:300}
+h2{font-size:clamp(1.75rem,3.4vw,2.5rem);line-height:1.14;font-weight:300}
+h3{font-size:1.12rem;font-family:var(--f-texto);font-weight:600;letter-spacing:0}
+p{margin:0}
+
+.eyebrow{
+  font-family:var(--f-mono);font-size:.7rem;font-weight:500;
+  letter-spacing:.24em;text-transform:uppercase;color:var(--teja);
+}
+.suave{color:var(--humo)}
+.medida{max-width:63ch}
+
+/* ---------- cristal ---------- */
+.cristal{
+  background:linear-gradient(160deg,rgba(29,23,25,.72),rgba(11,9,9,.58));
+  backdrop-filter:blur(22px) saturate(130%);
+  -webkit-backdrop-filter:blur(22px) saturate(130%);
+  border:1px solid var(--linea);
+  border-radius:var(--r);
+}
+
+/* ---------- botones ---------- */
+.btn{
+  display:inline-flex;align-items:center;gap:.6rem;
+  padding:.82rem 1.45rem;border-radius:999px;
+  font-family:var(--f-texto);font-size:.95rem;font-weight:500;
+  text-decoration:none;cursor:pointer;
+  border:1px solid var(--linea);
+  background:rgba(223,217,216,.05);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  color:var(--lino);
+  transition:transform .35s var(--ease),border-color .35s var(--ease),background .35s var(--ease);
+}
+.btn:hover{transform:translateY(-2px);border-color:rgba(252,143,143,.42);background:rgba(223,217,216,.09)}
+.btn:focus-visible{outline:2px solid var(--coral);outline-offset:3px}
+
+/* Vino translúcido sobre el desenfoque: cristal, sin halo de color. */
+.btn-fuerte{
+  border-color:rgba(252,143,143,.32);
+  background:linear-gradient(140deg,rgba(100,36,47,.52),rgba(180,68,70,.30));
+  color:#FDF6F5;font-weight:600;
+}
+.btn-fuerte:hover{
+  background:linear-gradient(140deg,rgba(116,42,55,.66),rgba(196,76,78,.40));
+  border-color:rgba(252,143,143,.58);
+}
+.btn .peso{font-family:var(--f-mono);font-size:.76rem;color:rgba(253,246,245,.68);font-weight:400}
+
+/* ---------- barra ---------- */
+.barra{
+  position:sticky;top:0;z-index:40;
+  background:rgba(11,9,9,.6);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  border-bottom:1px solid transparent;
+  transition:border-color .4s var(--ease),background .4s var(--ease);
+}
+.barra.pegada{border-bottom-color:var(--linea);background:rgba(11,9,9,.82)}
+.barra .env{display:flex;align-items:center;gap:1.6rem;height:66px}
+
+.marca{display:flex;align-items:center;gap:.6rem;text-decoration:none;color:var(--lino);margin-right:auto}
+.marca svg{width:22px;height:26px;display:block}
+.marca b{font-family:var(--f-display);font-weight:500;font-size:1.3rem;letter-spacing:.02em}
+
+.nav{display:flex;gap:1.5rem}
+.nav a{
+  color:var(--humo);text-decoration:none;font-size:.9rem;position:relative;padding:.2rem 0;
+  transition:color .3s var(--ease);
+}
+.nav a::after{
+  content:"";position:absolute;left:0;right:0;bottom:-2px;height:1px;
+  background:var(--coral);transform:scaleX(0);transform-origin:left;
+  transition:transform .4s var(--ease);
+}
+.nav a:hover{color:var(--lino)}
+.nav a:hover::after{transform:scaleX(1)}
+@media(max-width:860px){.nav{display:none}}
+
+/* ---------- entrada de la página ---------- */
+.sube{animation:sube .9s var(--ease) both}
+.sube-2{animation-delay:.1s}
+.sube-3{animation-delay:.2s}
+.sube-4{animation-delay:.3s}
+@keyframes sube{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+/* ---------- portada ---------- */
+.portada{padding:clamp(3.4rem,8vw,6rem) 0 2.6rem}
+.portada-fila{display:grid;grid-template-columns:1fr auto;gap:3rem;align-items:center}
+@media(max-width:860px){.portada-fila{grid-template-columns:1fr;gap:2rem}.escudo-grande{display:none}}
+
+/* El nombre pesa un punto más que el resto del titular. Sin cursiva. */
+h1 .nombre{font-weight:400;font-style:normal;color:var(--lino)}
+
+.lema{margin-top:1.5rem;font-size:1.08rem;color:var(--humo);max-width:54ch}
+.lema b{color:var(--lino);font-weight:500}
+
+.acciones{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:2rem}
+
+.datos{
+  display:flex;flex-wrap:wrap;gap:.5rem 1.6rem;margin-top:1.8rem;
+  font-family:var(--f-mono);font-size:.76rem;color:var(--humo);letter-spacing:.04em;
+}
+.datos span{display:flex;align-items:center;gap:.5rem}
+.datos span::before{content:"";width:4px;height:4px;border-radius:50%;background:var(--teja)}
+
+.escudo-grande{width:200px;filter:drop-shadow(0 24px 50px rgba(100,36,47,.6));animation:respira 7s ease-in-out infinite}
+@keyframes respira{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+/* ---------- secciones ---------- */
+section{padding:clamp(3.4rem,7vw,5.6rem) 0;position:relative}
+section+section{border-top:1px solid var(--linea-vino)}
+.cabeza{display:flex;flex-direction:column;gap:.9rem;margin-bottom:2.6rem}
+
+/* ============================================================
+   CONSOLA · la demostración
+   ============================================================ */
+.consola{
+  display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);
+  gap:0;overflow:hidden;padding:0;
+}
+@media(max-width:900px){.consola{grid-template-columns:1fr}}
+
+.operador{
+  padding:1.1rem;display:flex;flex-direction:column;gap:1rem;
+  border-right:1px solid var(--linea);background:rgba(21,17,18,.5);
+}
+@media(max-width:900px){.operador{border-right:none;border-bottom:1px solid var(--linea)}}
+
+.pestanas{display:flex;gap:.3rem;background:rgba(11,9,9,.6);padding:.25rem;border-radius:10px;border:1px solid var(--linea)}
+.pestanas button{
+  flex:1;padding:.5rem .3rem;border:0;border-radius:7px;cursor:pointer;
+  font-family:var(--f-texto);font-size:.82rem;color:var(--humo);background:transparent;
+  transition:color .3s var(--ease),background .3s var(--ease);
+}
+.pestanas button:hover{color:var(--lino)}
+.pestanas button[aria-selected="true"]{background:rgba(180,68,70,.24);color:var(--lino);box-shadow:inset 0 0 0 1px rgba(252,143,143,.22)}
+
+.rotulo{font-family:var(--f-mono);font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:var(--humo)}
+
+.lista{display:flex;flex-direction:column;gap:.3rem}
+.lista button{
+  text-align:left;padding:.55rem .7rem;border-radius:8px;cursor:pointer;
+  border:1px solid transparent;background:transparent;color:var(--lino);
+  font-family:var(--f-texto);font-size:.88rem;line-height:1.35;
+  transition:background .28s var(--ease),border-color .28s var(--ease),transform .28s var(--ease);
+}
+.lista button:hover{background:rgba(252,143,143,.07);border-color:rgba(252,143,143,.18);transform:translateX(3px)}
+.lista button[aria-current="true"]{background:rgba(180,68,70,.22);border-color:rgba(252,143,143,.28)}
+.lista small{display:block;color:var(--humo);font-size:.72rem;font-family:var(--f-mono);margin-top:.15rem}
+
+.chips{display:flex;flex-wrap:wrap;gap:.35rem}
+.chip{
+  padding:.34rem .62rem;border-radius:999px;cursor:pointer;
+  border:1px solid var(--linea);background:rgba(223,217,216,.04);
+  color:var(--humo);font-family:var(--f-mono);font-size:.72rem;
+  transition:all .28s var(--ease);
+}
+.chip:hover{color:var(--lino);border-color:rgba(252,143,143,.4);transform:translateY(-2px)}
+.chip[aria-current="true"]{background:rgba(180,68,70,.3);color:var(--lino);border-color:rgba(252,143,143,.45)}
+/* Una versión que no viene incluida: se ve que el espacio existe, pero está vacío. */
+.chip.ausente{border-style:dashed;color:rgba(139,126,128,.85)}
+
+.previa{display:flex;gap:.7rem;align-items:center}
+.previa-caja{
+  width:96px;aspect-ratio:16/9;border-radius:6px;flex:none;overflow:hidden;
+  border:1px solid var(--linea);background:linear-gradient(150deg,#1A0E12,#0B0909);
+  display:flex;align-items:center;justify-content:center;padding:4px;
+}
+.previa-caja span{font-size:6.5px;line-height:1.25;text-align:center;color:rgba(223,217,216,.8)}
+
+.panico{display:grid;grid-template-columns:repeat(4,1fr);gap:.3rem;margin-top:auto}
+.panico button{
+  padding:.5rem .2rem;border-radius:8px;cursor:pointer;
+  border:1px solid var(--linea);background:rgba(11,9,9,.5);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  color:var(--humo);font-family:var(--f-mono);font-size:.66rem;letter-spacing:.04em;
+  transition:all .26s var(--ease);
+}
+.panico button:hover{color:var(--lino);border-color:rgba(252,143,143,.35);transform:translateY(-2px)}
+.panico button[aria-pressed="true"]{background:rgba(180,68,70,.34);color:#FDF6F5;border-color:rgba(252,143,143,.5)}
+
+/* --- salida --- */
+.salida-envoltura{padding:1.1rem;display:flex;flex-direction:column;gap:.75rem;min-width:0}
+
+.salida-barra{display:flex;align-items:center;gap:.7rem;font-family:var(--f-mono);font-size:.68rem;color:var(--humo);letter-spacing:.14em;text-transform:uppercase}
+.tally{display:flex;align-items:center;gap:.4rem;color:var(--coral)}
+.tally i{width:7px;height:7px;border-radius:50%;background:var(--coral);animation:latir 1.9s ease-in-out infinite}
+@keyframes latir{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(252,143,143,.5)}50%{opacity:.45;box-shadow:0 0 0 6px rgba(252,143,143,0)}}
+
+.salida{
+  position:relative;aspect-ratio:16/9;width:100%;overflow:hidden;border-radius:10px;
+  border:1px solid rgba(252,143,143,.18);
+  background:#000;
+  box-shadow:0 26px 70px -30px rgba(0,0,0,1), inset 0 0 90px rgba(100,36,47,.3);
+}
+.capa{position:absolute;inset:0}
+.capa-fondo{background:radial-gradient(120% 130% at 50% 0%,#3A1820 0%,#1A0B0F 52%,#080607 100%)}
+
+.diapo{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:.35em;
+  padding:6% 8%;text-align:center;
+}
+.diapo .linea{
+  font-size:clamp(.78rem,2.25vw,1.55rem);line-height:1.34;font-weight:500;
+  color:#F6EFEE;text-shadow:0 2px 18px rgba(0,0,0,.8);
+}
+.diapo .ref{
+  margin-top:.5em;font-family:var(--f-mono);font-size:clamp(.55rem,1.15vw,.8rem);
+  letter-spacing:.14em;text-transform:uppercase;color:var(--coral);
+}
+.diapo .vnum{font-size:.6em;vertical-align:super;color:var(--coral);margin-right:.15em}
+
+.capa-logo{
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(90% 110% at 50% 45%,#2A1216,#080607);
+  opacity:0;pointer-events:none;transition:opacity .5s var(--ease);
+}
+.capa-logo svg{width:22%;filter:drop-shadow(0 10px 30px rgba(100,36,47,.9))}
+.salida[data-logo="1"] .capa-logo{opacity:1}
+
+.capa-negro{background:#000;opacity:0;pointer-events:none;transition:opacity .35s var(--ease)}
+.salida[data-negro="1"] .capa-negro{opacity:1}
+.salida[data-texto="0"] .capa-contenido{opacity:0;transition:opacity .4s var(--ease)}
+
+/* --- transiciones (las mismas que trae Coraza) --- */
+.diapo.sale{animation:salir .4s var(--ease) both}
+@keyframes salir{to{opacity:0}}
+
+[data-trans="corte"] .diapo.entra,[data-trans="corte"] .diapo.sale{animation:none}
+[data-trans="corte"] .diapo.sale{opacity:0}
+
+[data-trans="fundido"] .diapo.entra{animation:enFundido .6s var(--ease) both}
+@keyframes enFundido{from{opacity:0}to{opacity:1}}
+
+[data-trans="desenfoque"] .diapo.entra{animation:enDesenfoque .65s var(--ease) both}
+@keyframes enDesenfoque{from{opacity:0;filter:blur(16px)}to{opacity:1;filter:blur(0)}}
+
+[data-trans="deslizar"] .diapo.entra{animation:enDeslizar .6s var(--ease) both}
+@keyframes enDeslizar{from{opacity:0;transform:translateX(7%)}to{opacity:1;transform:none}}
+
+[data-trans="acercamiento"] .diapo.entra{animation:enAcercar .65s var(--ease) both}
+@keyframes enAcercar{from{opacity:0;transform:scale(1.07)}to{opacity:1;transform:none}}
+
+[data-trans="lineas"] .diapo.entra .linea,
+[data-trans="lineas"] .diapo.entra .ref{animation:enLinea .5s var(--ease) both;animation-delay:calc(var(--i) * 110ms)}
+@keyframes enLinea{from{opacity:0;transform:translateY(.5em)}to{opacity:1;transform:none}}
+
+[data-trans="maquina"] .diapo.entra .linea,
+[data-trans="maquina"] .diapo.entra .ref{
+  animation:enMaquina .5s steps(26,end) both;animation-delay:calc(var(--i) * 420ms);
+}
+@keyframes enMaquina{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+
+.transiciones{display:flex;flex-wrap:wrap;gap:.3rem}
+.aviso-movimiento{
+  display:none;font-family:var(--f-mono);font-size:.68rem;color:var(--humo);
+  border-left:2px solid var(--teja);padding-left:.6rem;line-height:1.45;
+}
+body.reduce .aviso-movimiento{display:block}
+
+.pie-consola{
+  display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem;
+  font-family:var(--f-mono);font-size:.7rem;color:var(--humo);
+  padding:.9rem 1.1rem;border-top:1px solid var(--linea);grid-column:1/-1;
+}
+.pie-consola kbd{
+  font-family:var(--f-mono);font-size:.68rem;color:var(--lino);
+  border:1px solid var(--linea);border-bottom-width:2px;border-radius:4px;padding:.05rem .35rem;
+}
+
+/* ---------- funciones ---------- */
+.rejilla{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:0}
+.fn{
+  padding:1.6rem 1.5rem;border-top:1px solid var(--linea);
+  display:flex;flex-direction:column;gap:.55rem;
+  transition:background .4s var(--ease);
+}
+.fn:hover{background:rgba(180,68,70,.06)}
+.fn .num{font-family:var(--f-mono);font-size:.68rem;color:var(--teja);letter-spacing:.16em}
+.fn p{color:var(--humo);font-size:.92rem}
+.fn .detalle{font-family:var(--f-mono);font-size:.72rem;color:rgba(139,126,128,.78);line-height:1.5}
+
+/* ---------- atajos ---------- */
+.atajos{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:0 2.6rem}
+.atajo{
+  display:flex;align-items:baseline;gap:1rem;padding:.72rem 0;
+  border-bottom:1px solid var(--linea);
+  transition:padding-left .35s var(--ease),border-color .35s var(--ease);
+}
+.atajo:hover{padding-left:.5rem;border-bottom-color:rgba(252,143,143,.32)}
+.atajo .tecla{
+  font-family:var(--f-mono);font-size:.8rem;color:var(--coral);
+  min-width:9.5rem;flex:none;letter-spacing:.02em;
+}
+.atajo .que{font-size:.9rem;color:var(--humo)}
+
+/* ---------- sin internet ---------- */
+.tres{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem}
+.tres > div{padding:1.5rem;display:flex;flex-direction:column;gap:.5rem;transition:transform .45s var(--ease),border-color .45s var(--ease)}
+.tres > div:hover{transform:translateY(-4px);border-color:rgba(252,143,143,.28)}
+.tres p{color:var(--humo);font-size:.9rem}
+
+/* ---------- descarga ---------- */
+.descarga{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1rem;margin-bottom:2.6rem}
+.paquete{
+  padding:1.7rem;display:flex;flex-direction:column;gap:.7rem;
+  transition:transform .45s var(--ease),border-color .45s var(--ease),background .45s var(--ease);
+}
+.paquete:hover{transform:translateY(-5px);border-color:rgba(252,143,143,.3);background:linear-gradient(160deg,rgba(35,27,30,.78),rgba(11,9,9,.6))}
+.paquete .btn{margin-top:.6rem;align-self:flex-start}
+.paquete p{color:var(--humo);font-size:.9rem}
+
+.pasos{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.6rem;counter-reset:p}
+.paso{display:flex;flex-direction:column;gap:.45rem}
+.paso .n{
+  font-family:var(--f-mono);font-size:.7rem;color:var(--teja);letter-spacing:.16em;
+  padding-bottom:.5rem;border-bottom:1px solid var(--linea-vino);
+}
+.paso p{color:var(--humo);font-size:.9rem}
+.paso code{font-family:var(--f-mono);font-size:.82rem;color:var(--lino);background:rgba(223,217,216,.06);padding:.1rem .35rem;border-radius:4px}
+
+/* ---------- pie ---------- */
+footer{border-top:1px solid var(--linea-vino);padding:3.4rem 0 3rem;position:relative;z-index:1}
+.verso{
+  font-family:var(--f-display);font-style:italic;font-size:clamp(1.15rem,2.6vw,1.6rem);
+  line-height:1.45;color:var(--lino);max-width:34ch;
+}
+.verso .cita{display:block;margin-top:.7rem;font-family:var(--f-mono);font-style:normal;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--teja)}
+.legal{margin-top:2.6rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.4rem;font-size:.8rem;color:var(--humo);line-height:1.6}
+.legal a{color:var(--humo);text-decoration:underline;text-decoration-color:var(--linea-vino);text-underline-offset:3px;transition:color .3s var(--ease)}
+.legal a:hover{color:var(--coral)}
+.legal strong{color:var(--lino);font-weight:500;display:block;margin-bottom:.3rem;font-family:var(--f-mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase}
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+}
+</style>
+
+<!-- Escudo de Coraza: la misma geometría vectorial de src/Coraza.Rendering/LogoCoraza.cs -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="g-escudo" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0" stop-color="#B44446"></stop>
+      <stop offset="1" stop-color="#64242F"></stop>
+    </linearGradient>
+    <radialGradient id="g-brillo">
+      <stop offset="0" stop-color="#FC8F8F" stop-opacity=".78"></stop>
+      <stop offset="1" stop-color="#FC8F8F" stop-opacity="0"></stop>
+    </radialGradient>
+    <symbol id="escudo" viewBox="0 0 100 120">
+      <path d="M50,4 C62,10 76,13 90,14 C92,52 82,88 50,116 C18,88 8,52 10,14 C24,13 38,10 50,4 Z"
+            fill="url(#g-escudo)" stroke="#FC8F8F" stroke-width="2.2" stroke-linejoin="round"></path>
+      <path d="M50,17 L50,104 M22,32 L50,45 L78,32 M24,56 L50,69 L76,56 M31,80 L50,90 L69,80"
+            fill="none" stroke="#DFD9D8" stroke-opacity=".59" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round"></path>
+      <circle cx="50" cy="57" r="17" fill="url(#g-brillo)"></circle>
+      <path d="M50,48 C51.4,54 52.6,55.6 59,57 C52.6,58.4 51.4,60 50,66 C48.6,60 47.4,58.4 41,57 C47.4,55.6 48.6,54 50,48 Z"
+            fill="#FC8F8F"></path>
+      <circle cx="50" cy="57" r="1.6" fill="#FFFFFF"></circle>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="barra" id="barra">
+  <div class="env">
+    <a class="marca" href="#inicio">
+      <svg aria-hidden="true"><use href="#escudo"></use></svg>
+      <b>Coraza</b>
+    </a>
+    <nav class="nav">
+      <a href="#consola">La consola</a>
+      <a href="#funciones">Funciones</a>
+      <a href="#rvr1960">Biblias</a>
+      <a href="#atajos">Atajos</a>
+      <a href="#descargar">Descargar</a>
+    </nav>
+    <a class="btn btn-fuerte" href="#descargar">Descargar</a>
+  </div>
+</header>
+
+<main id="inicio">
+
+  <!-- ============ PORTADA ============ -->
+  <div class="env portada">
+    <div class="portada-fila">
+      <div>
+        <p class="eyebrow sube">Canciones · Biblia · Anuncios · Windows</p>
+        <h1 class="sube sube-2"><span class="nombre">Coraza,</span> tu ayuda idónea<br>para proyectar en tu iglesia</h1>
+        <p class="lema sube sube-3">
+          Lleva las canciones, los versículos y los anuncios al Video Beam sin que tengas
+          que pelear con el computador. <b>Funciona completo sin internet</b>, porque la red de la
+          iglesia no siempre colabora.
+        </p>
+        <div class="acciones sube sube-4">
+          <a class="btn btn-fuerte" id="descarga-principal" href="#descargar">
+            Descargar para Windows <span class="peso">ZIP · 82 MB</span>
+          </a>
+          <a class="btn" href="#consola">Ver cómo funciona</a>
+        </div>
+        <div class="datos sube sube-4">
+          <span>Windows 10 y 11 · 64 bits</span>
+          <span>No se instala: se descomprime y se abre</span>
+          <span>No pide cuenta ni licencia</span>
+          <span>Gratis</span>
+        </div>
+      </div>
+      <svg class="escudo-grande sube sube-2" viewBox="0 0 100 120" aria-hidden="true"><use href="#escudo"></use></svg>
+    </div>
+  </div>
+
+  <!-- ============ CONSOLA ============ -->
+  <section id="consola">
+    <div class="env">
+      <div class="cabeza">
+        <p class="eyebrow">Pruébalo aquí mismo</p>
+        <h2>Así se ve desde el puesto del operador</h2>
+        <p class="suave medida">
+          A la izquierda está lo que tú manejas; a la derecha, lo que alcanza a ver la congregación.
+          Elige una canción, salta al coro, busca un versículo o baja a negro. Lo que toques abajo
+          pasa arriba, igual que en el programa.
+        </p>
+      </div>
+
+      <div class="consola cristal">
+        <!-- ---- panel del operador ---- -->
+        <div class="operador">
+          <div class="pestanas" role="tablist">
+            <button role="tab" aria-selected="true" data-tab="canciones">Canciones</button>
+            <button role="tab" aria-selected="false" data-tab="biblia">Biblia</button>
+            <button role="tab" aria-selected="false" data-tab="textos">Textos</button>
+          </div>
+
+          <div id="panel" style="display:flex;flex-direction:column;gap:.85rem"></div>
+
+          <div class="previa">
+            <div class="previa-caja"><span id="previa-texto">—</span></div>
+            <div style="min-width:0">
+              <p class="rotulo">Vista previa</p>
+              <p class="suave" style="font-size:.76rem;line-height:1.4">Lo siguiente en la fila. Enter lo manda al vivo.</p>
+            </div>
+          </div>
+
+          <div>
+            <p class="rotulo" style="margin-bottom:.4rem">Botones de pánico</p>
+            <div class="panico">
+              <button data-panico="negro" aria-pressed="false">Negro</button>
+              <button data-panico="logo" aria-pressed="false">Logo</button>
+              <button data-panico="texto" aria-pressed="false">Ocultar</button>
+              <button data-panico="limpiar">Limpiar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---- salida ---- -->
+        <div class="salida-envoltura">
+          <div class="salida-barra">
+            <span class="tally"><i></i> En vivo</span>
+            <span id="etiqueta-salida">Pantalla 2 · 1920×1080</span>
+          </div>
+
+          <div class="salida" id="salida" data-trans="fundido" data-negro="0" data-logo="0" data-texto="1">
+            <div class="capa capa-fondo"></div>
+            <div class="capa capa-contenido" id="contenido"></div>
+            <div class="capa capa-logo"><svg viewBox="0 0 100 120" aria-hidden="true"><use href="#escudo"></use></svg></div>
+            <div class="capa capa-negro"></div>
+          </div>
+
+          <div>
+            <p class="rotulo" style="margin-bottom:.4rem">Transición · pasa el mouse para verla</p>
+            <div class="transiciones" id="transiciones"></div>
+          </div>
+
+          <p class="aviso-movimiento">
+            Tu sistema pide «reducir movimiento»: aquí todo cambia en seco.
+            Coraza tiene esa misma opción en Configuración y la respeta en la proyección real.
+          </p>
+        </div>
+
+        <div class="pie-consola">
+          <span>Avanza con <kbd>→</kbd> <kbd>Espacio</kbd> · retrocede con <kbd>←</kbd></span>
+          <span>De las 15 transiciones que trae Coraza, aquí hay 7</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FUNCIONES ============ -->
+  <section id="funciones">
+    <div class="env">
+      <div class="cabeza">
+        <p class="eyebrow">Qué hace</p>
+        <h2>Hecho para quien tiene tres segundos para reaccionar</h2>
+        <p class="suave medida">
+          El pastor cambia de texto sin avisar, el director repite el coro una vez más y a alguien
+          se le ocurre un anuncio a mitad del culto. Coraza está pensado para esos momentos.
+        </p>
+      </div>
+
+      <div class="rejilla">
+        <article class="fn">
+          <span class="num">CANCIONES</span>
+          <h3>Pegas la letra y quedan las diapositivas</h3>
+          <p>Marcas las secciones, dices en qué orden se cantan y Coraza reparte el texto en pantallas que se alcanzan a leer desde atrás.</p>
+          <p class="detalle">[Verso 1] [Coro] [Puente] · orden «V1 C V2 C P C» · si escribiste un [Final] y se te quedó fuera del orden, se proyecta igual y el editor te lo advierte.</p>
+        </article>
+
+        <article class="fn">
+          <span class="num">BIBLIA</span>
+          <h3>Escribe la cita como te salga</h3>
+          <p>Vienen incluidas la Reina-Valera 1909 y la Versión Biblia Libre. Si no recuerdas dónde estaba el versículo, lo buscas por palabras.</p>
+          <p class="detalle">Entiende «jn 3 16», «Juan 3:16-18», «1 cor 13», «sal 23 1-6», «Ef 6.14» y «San Juan 3:16».</p>
+        </article>
+
+        <article class="fn">
+          <span class="num">MEDIOS</span>
+          <h3>Imágenes, video, PDF y PowerPoint</h3>
+          <p>Arrastras el archivo, lo pegas con Ctrl+V o abres la carpeta de la USB. El PDF entra con cada página como una diapositiva.</p>
+          <p class="detalle">JPG · PNG · GIF · WebP · HEIC · MP4 · WMV · MOV · MP3 · y una presentación de fotos que avanza sola.</p>
+        </article>
+
+        <article class="fn">
+          <span class="num">PROYECCIÓN</span>
+          <h3>Cambiar la letra no reinicia el fondo</h3>
+          <p>El fondo, el texto, el logo y el negro van en capas aparte, así que el video de atrás sigue corriendo mientras avanzas la canción.</p>
+          <p class="detalle">Si avanzas en mitad de una transición, se completa al instante en vez de hacer fila.</p>
+        </article>
+
+        <article class="fn">
+          <span class="num">SERVICIO</span>
+          <h3>El orden del culto, listo desde el sábado</h3>
+          <p>Arrastras las canciones y las lecturas a la lista, las reordenas y les pones notas para ti mismo. El domingo solo vas bajando.</p>
+          <p class="detalle">Tiempo estimado · se guarda solo · puedes duplicar el servicio de la semana pasada.</p>
+        </article>
+
+        <article class="fn">
+          <span class="num">CONFIANZA</span>
+          <h3>No se cierra, no se duerme y no muestra pantallas de error</h3>
+          <p>Si alguien tropieza con el cable del Video Beam y lo vuelve a conectar, la proyección regresa sola.</p>
+          <p class="detalle">No deja suspender el equipo durante el culto · respaldo diario, con los últimos 30 · te avisa si Windows quedó en modo «Duplicar».</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RVR1960 ============ -->
+  <section id="rvr1960">
+    <div class="env">
+      <div class="cabeza">
+        <p class="eyebrow">La pregunta de siempre</p>
+        <h2>¿Y la Reina-Valera 1960?</h2>
+        <p class="suave medida">
+          Es la versión que se lee en casi todas nuestras iglesias y es, al mismo tiempo, la única
+          que no se puede empaquetar: el texto de la RVR1960 tiene derechos de autor de las
+          Sociedades Bíblicas Unidas. Repartirla dentro del programa sería copiar lo que no es mío.
+          Así que Coraza hace lo que sí puede hacer, que es dejarte traer la tuya y usarla como
+          cualquier otra.
+        </p>
+      </div>
+      <div class="tres">
+        <div class="cristal">
+          <p class="rotulo">Si ya la tienes</p>
+          <h3>Se importa en un minuto</h3>
+          <p>Vas a <em>Biblia → Importar</em>, eliges el archivo del módulo y queda en la lista junto a las demás. De ahí en adelante cambias de versión con un clic, en mitad del culto si hace falta.</p>
+        </div>
+        <div class="cristal">
+          <p class="rotulo">Formatos que lee</p>
+          <h3>Sirve el módulo que ya usas</h3>
+          <p>e-Sword (<code style="font-family:var(--f-mono);font-size:.8rem">.bblx</code>), MySword, MyBible, Zefania XML, OSIS, USFM y VPL. Son los mismos archivos que circulan para los programas de estudio bíblico.</p>
+        </div>
+        <div class="cristal">
+          <p class="rotulo">Mientras tanto</p>
+          <h3>Vienen dos Biblias completas</h3>
+          <p>La Reina-Valera 1909, que es de dominio público y conserva el sabor del texto clásico, y la Versión Biblia Libre, en el español que se habla hoy.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ATAJOS ============ -->
+  <section id="atajos">
+    <div class="env">
+      <div class="cabeza">
+        <p class="eyebrow">Sin soltar el teclado</p>
+        <h2>Lo urgente está en el teclado</h2>
+        <p class="suave medida">
+          Buscar un botón con el mouse mientras la congregación espera se siente eterno.
+          Estas teclas son las que de verdad vas a usar.
+        </p>
+      </div>
+      <div class="atajos">
+        <div class="atajo"><span class="tecla">→ · Espacio · Av Pág</span><span class="que">Siguiente diapositiva</span></div>
+        <div class="atajo"><span class="tecla">← · Re Pág</span><span class="que">Diapositiva anterior</span></div>
+        <div class="atajo"><span class="tecla">↓ · ↑</span><span class="que">Siguiente o anterior elemento del servicio</span></div>
+        <div class="atajo"><span class="tecla">Enter</span><span class="que">Enviar la vista previa al vivo</span></div>
+        <div class="atajo"><span class="tecla">C · V + número · P</span><span class="que">Saltar al coro, a un verso, al puente</span></div>
+        <div class="atajo"><span class="tecla">B · L · T</span><span class="que">Negro · Logo · Ocultar texto</span></div>
+        <div class="atajo"><span class="tecla">Esc · Mayús + Esc</span><span class="que">Salir de pantalla completa · Limpiar</span></div>
+        <div class="atajo"><span class="tecla">Ctrl + K</span><span class="que">Búsqueda universal</span></div>
+        <div class="atajo"><span class="tecla">Ctrl + B · Ctrl + N</span><span class="que">Biblia · Nueva canción</span></div>
+        <div class="atajo"><span class="tecla">F5 · F11</span><span class="que">Iniciar proyección · Modo concentración</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SIN INTERNET ============ -->
+  <section id="offline">
+    <div class="env">
+      <div class="cabeza">
+        <p class="eyebrow">La razón de ser</p>
+        <h2>No necesita internet ni una cuenta</h2>
+        <p class="suave medida">
+          Se descarga una vez y queda funcionando. No hay que iniciar sesión, ni renovar nada,
+          ni esperar a que cargue.
+        </p>
+      </div>
+      <div class="tres">
+        <div class="cristal">
+          <p class="rotulo">Todo local</p>
+          <h3>Tus cosas se quedan en tu computador</h3>
+          <p>Las canciones, las Biblias, los temas y los servicios se guardan en <code style="font-family:var(--f-mono);font-size:.82rem">Documentos\Coraza</code>. De ahí no salen.</p>
+        </div>
+        <div class="cristal">
+          <p class="rotulo">Portátil</p>
+          <h3>Cabe en una memoria USB</h3>
+          <p>La versión portátil guarda el programa y tus datos en la misma carpeta. Llegas con la USB, la conectas y proyectas con tus propias canciones.</p>
+        </div>
+        <div class="cristal">
+          <p class="rotulo">Sin instalar</p>
+          <h3>Descomprimir y abrir</h3>
+          <p>Trae adentro todo lo que necesita para funcionar. En el computador de la iglesia no hay que instalar nada más ni pedirle la contraseña a nadie.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DESCARGA ============ -->
+  <section id="descargar">
+    <div class="env">
+      <div class="cabeza">
+        <p class="eyebrow">Descargar</p>
+        <h2>Pruébalo antes del próximo domingo</h2>
+        <p class="suave medida">Los dos paquetes traen el programa completo. Lo único que cambia es dónde quedan guardados tus datos.</p>
+      </div>
+
+      <div class="descarga">
+        <article class="paquete cristal">
+          <p class="rotulo">Recomendado</p>
+          <h3>Coraza para Windows</h3>
+          <p>Para el computador de la iglesia. Tus datos quedan en <code style="font-family:var(--f-mono);font-size:.82rem">Documentos\Coraza</code> y se respaldan solos todos los días.</p>
+          <a class="btn btn-fuerte" id="enlace-normal" href="#">Descargar ZIP <span class="peso">82 MB</span></a>
+        </article>
+
+        <article class="paquete cristal">
+          <p class="rotulo">Para la USB</p>
+          <h3>Coraza portátil</h3>
+          <p>Para llevar en la USB. El programa y tus canciones viajan juntos, así te toque proyectar desde un computador distinto cada domingo.</p>
+          <a class="btn" id="enlace-portatil" href="#">Descargar ZIP portátil <span class="peso">82 MB</span></a>
+        </article>
+      </div>
+
+      <div class="pasos">
+        <div class="paso">
+          <span class="n">PASO 01</span>
+          <h3>Descomprime</h3>
+          <p>Clic derecho sobre el ZIP y <em>Extraer todo</em>. Saca la carpeta antes de abrirla: desde adentro del ZIP, Windows no lo ejecuta bien.</p>
+        </div>
+        <div class="paso">
+          <span class="n">PASO 02</span>
+          <h3>Abre <code>Coraza.exe</code></h3>
+          <p>La primera vez Windows avisa que no reconoce el programa. Le pasa a todo lo que no está firmado: <em>Más información → Ejecutar de todas formas</em>.</p>
+        </div>
+        <div class="paso">
+          <span class="n">PASO 03</span>
+          <h3>Sigue el asistente</h3>
+          <p>Te pregunta el nombre de la iglesia, cuál de las pantallas es el Video Beam, el tema y la versión bíblica. En dos minutos queda listo.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="env">
+    <p class="verso">
+      «Así que levántense, pónganse el cinturón de la verdad,<br>pónganse la coraza de justicia y rectitud.»
+      <span class="cita">Efesios 6:14 · Versión Biblia Libre</span>
+    </p>
+
+    <div class="legal">
+      <div>
+        <strong>Biblias incluidas</strong>
+        Reina-Valera 1909, dominio público. Conserva su ortografía de época («crió», «fué», «á»): no son erratas y no se corrigen.
+        Versión Biblia Libre (VBL), © 2018-2020 Jonathan Gallagher y Shelly Barrios de Avila,
+        <a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>, sin modificar el texto.
+      </div>
+      <div>
+        <strong>Otras versiones</strong>
+        RVR1960, NVI y NTV tienen derechos de autor y no se distribuyen con el programa.
+        Importar un módulo que tu iglesia ya posee no cambia esa titularidad: el texto sigue siendo
+        de su editorial y se usa bajo las condiciones con que lo adquiriste.
+      </div>
+      <div>
+        <strong>Canciones</strong>
+        Proyectar letras con derechos de autor normalmente requiere una licencia CCLI o equivalente.
+        Coraza guarda el número de licencia y los créditos de cada canción.
+        Los himnos de esta página son de dominio público.
+      </div>
+      <div>
+        <strong>En camino</strong>
+        Control remoto desde el celular por red local, pantalla de escenario, salida NDI y alertas.
+        Sin nube: lo que hoy funciona sin internet va a seguir funcionando sin internet.
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ==========================================================================
+   ENLACES DE DESCARGA
+   Apuntan a la última Release del repositorio. Gracias a /latest/download/
+   el enlace sigue sirviendo cuando publiques una versión nueva: subes los
+   ZIP a la Release y esta página no se toca.
+   ========================================================================== */
+const DESCARGAS = {
+  normal:   "https://github.com/John-Elith/Coraza/releases/latest/download/Coraza-win-x64.zip",
+  portatil: "https://github.com/John-Elith/Coraza/releases/latest/download/Coraza-win-x64-portatil.zip"
+};
+
+for (const [id, url] of [["enlace-normal", DESCARGAS.normal], ["enlace-portatil", DESCARGAS.portatil]]) {
+  const a = document.getElementById(id);
+  a.href = url;
+  a.setAttribute("rel", "noopener");
+}
+
+/* ---------- barra pegada ---------- */
+const barra = document.getElementById("barra");
+addEventListener("scroll", () => barra.classList.toggle("pegada", scrollY > 12), { passive: true });
+
+/* ---------- movimiento reducido ---------- */
+const sinMovimiento = matchMedia("(prefers-reduced-motion: reduce)");
+const aplicarMovimiento = () => document.body.classList.toggle("reduce", sinMovimiento.matches);
+sinMovimiento.addEventListener("change", aplicarMovimiento);
+aplicarMovimiento();
+
+/* ==========================================================================
+   CONTENIDO DE LA DEMO
+   Himnos de dominio público y los versículos exactos que trae Coraza,
+   sacados de Recursos\Biblias\RV1909.vpl y VBL.vpl.
+   ========================================================================== */
+const CANCIONES = [
+  {
+    id: "santo",
+    titulo: "Santo, Santo, Santo",
+    credito: "Reginald Heber, 1826 · trad. Juan B. Cabrera",
+    orden: "V1 V2 V3 V4",
+    diapos: [
+      { seccion: "V1", lineas: ["Santo, Santo, Santo, Señor omnipotente,", "siempre el labio mío loores te dará;"] },
+      { seccion: "V1", lineas: ["Santo, Santo, Santo, te adoro reverente,", "Dios en tres Personas, bendita Trinidad."] },
+      { seccion: "V2", lineas: ["Santo, Santo, Santo, en numeroso coro,", "santos escogidos te adoran sin cesar,"] },
+      { seccion: "V2", lineas: ["de alegría llenos, y sus coronas de oro", "rinden ante el trono y el cristalino mar."] },
+      { seccion: "V3", lineas: ["Santo, Santo, Santo, la inmensa muchedumbre", "de ángeles que cumplen tu santa voluntad,"] },
+      { seccion: "V3", lineas: ["ante ti se postra bañada de tu lumbre,", "ante ti que has sido, que eres y que serás."] },
+      { seccion: "V4", lineas: ["Santo, Santo, Santo, por más que estés velado,", "e imposible sea tu gloria contemplar,"] },
+      { seccion: "V4", lineas: ["Santo tú eres solo, y nada hay a tu lado", "en poder perfecto, pureza y caridad."] }
+    ]
+  },
+  {
+    id: "cristo",
+    titulo: "Cristo me ama",
+    credito: "Anna B. Warner, 1860 · trad. tradicional",
+    orden: "V1 C V2 C",
+    diapos: [
+      { seccion: "V1", lineas: ["Cristo me ama, bien lo sé,", "su Palabra me hace ver"] },
+      { seccion: "V1", lineas: ["que los niños son de aquel", "quien es nuestro amigo fiel."] },
+      { seccion: "C",  lineas: ["Cristo me ama, Cristo me ama,", "Cristo me ama, la Biblia dice así."] },
+      { seccion: "V2", lineas: ["Cristo me ama, pues murió", "y el cielo me abrió;"] },
+      { seccion: "V2", lineas: ["él mis culpas quitará", "y la entrada me dará."] },
+      { seccion: "C",  lineas: ["Cristo me ama, Cristo me ama,", "Cristo me ama, la Biblia dice así."] }
+    ]
+  }
+];
+
+const VERSICULOS = [
+  {
+    ref: "Juan 3:16", escrito: "jn 3 16", numero: "16",
+    RV1909: "Porque de tal manera amó Dios al mundo, que ha dado á su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.",
+    VBL: "Porque Dios amó al mundo, y lo hizo de esta manera: entregó a su único Hijo, a fin de que todos los que crean en él no mueran, sino que tengan vida eterna."
+  },
+  {
+    ref: "Salmos 23:1", escrito: "sal 23 1", numero: "1",
+    RV1909: "JEHOVÁ es mi pastor; nada me faltará.",
+    VBL: "El Señor es mi pastor, y por ello tengo todo lo que necesito."
+  },
+  {
+    ref: "Efesios 6:14", escrito: "Ef 6.14", numero: "14",
+    RV1909: "Estad pues firmes, ceñidos vuestros lomos de verdad, y vestidos de la cota de justicia,",
+    VBL: "Así que levántense, pónganse el cinturón de la verdad, pónganse la coraza de justicia y rectitud,"
+  },
+  {
+    ref: "1 Corintios 13:4", escrito: "1 cor 13 4", numero: "4",
+    RV1909: "La caridad es sufrida, es benigna; la caridad no tiene envidia, la caridad no hace sinrazón, no se ensancha;",
+    VBL: "El amor es paciente y amable. El amor no es celoso. El amor no es jactancioso. El amor no es orgulloso."
+  }
+];
+
+const TEXTOS = [
+  { nombre: "Bienvenida", lineas: ["Bienvenidos a la casa de Dios", "Nos alegra que estés aquí"] },
+  { nombre: "Ofrenda",    lineas: ["Cada uno dé como propuso en su corazón", "2 Corintios 9:7"] },
+  { nombre: "Anuncio",    lineas: ["Reunión de jóvenes", "Viernes · 7:00 p. m. · Salón principal"] },
+  { nombre: "Cumpleaños", lineas: ["Feliz cumpleaños", "Que el Señor te guarde un año más"] }
+];
+
+const TRANSICIONES = [
+  ["fundido", "Fundido"], ["desenfoque", "Desenfoque"], ["deslizar", "Deslizar"],
+  ["acercamiento", "Acercamiento"], ["lineas", "Línea por línea"], ["maquina", "Máquina de escribir"],
+  ["corte", "Corte"]
+];
+
+/* ==========================================================================
+   ESTADO Y SALIDA
+   ========================================================================== */
+const salida = document.getElementById("salida");
+const contenido = document.getElementById("contenido");
+const panel = document.getElementById("panel");
+const previaTexto = document.getElementById("previa-texto");
+
+const estado = {
+  tab: "canciones",
+  cancion: CANCIONES[0],
+  indice: 0,
+  version: "RV1909",
+  transicion: "fundido",
+  transicionFijada: "fundido"
+};
+
+/** Pinta una diapositiva en la salida aplicando la transición activa. */
+function proyectar(lineas, ref) {
+  const anterior = contenido.querySelector(".diapo:not(.sale)");
+  if (anterior) {
+    anterior.classList.add("sale");
+    anterior.classList.remove("entra");
+    setTimeout(() => anterior.remove(), 420);
+  }
+
+  const diapo = document.createElement("div");
+  diapo.className = "diapo";
+  let i = 0;
+  for (const linea of lineas) {
+    const p = document.createElement("p");
+    p.className = "linea";
+    p.style.setProperty("--i", i++);
+    p.innerHTML = linea;
+    diapo.appendChild(p);
+  }
+  if (ref) {
+    const r = document.createElement("p");
+    r.className = "ref";
+    r.style.setProperty("--i", i);
+    r.textContent = ref;
+    diapo.appendChild(r);
+  }
+
+  contenido.appendChild(diapo);
+  void diapo.offsetWidth;          // fuerza el reflow para que la animación arranque
+  diapo.classList.add("entra");
+
+  // Proyectar siempre apaga el negro: es lo que hace Coraza al enviar al vivo.
+  salida.dataset.negro = "0";
+  salida.dataset.logo = "0";
+  salida.dataset.texto = "1";
+  sincronizarPanico();
+}
+
+function sincronizarPanico() {
+  document.querySelector('[data-panico="negro"]').setAttribute("aria-pressed", salida.dataset.negro === "1");
+  document.querySelector('[data-panico="logo"]').setAttribute("aria-pressed", salida.dataset.logo === "1");
+  document.querySelector('[data-panico="texto"]').setAttribute("aria-pressed", salida.dataset.texto === "0");
+}
+
+/* ---------- canciones ---------- */
+function mostrarDiapo(n) {
+  const d = estado.cancion.diapos;
+  estado.indice = (n + d.length) % d.length;
+  const actual = d[estado.indice];
+  proyectar(actual.lineas, estado.cancion.titulo);
+  // Se marca la pastilla del bloque que contiene esta diapositiva, no todas las que compartan nombre.
+  const pastillas = [...panel.querySelectorAll(".chip[data-i]")];
+  const activa = pastillas.filter(c => Number(c.dataset.i) <= estado.indice).pop();
+  pastillas.forEach(c => c.setAttribute("aria-current", String(c === activa)));
+  const siguiente = d[(estado.indice + 1) % d.length];
+  previaTexto.textContent = siguiente.lineas[0];
+}
+
+/* ---------- construcción de los paneles ---------- */
+function pintarPanel() {
+  panel.innerHTML = "";
+
+  if (estado.tab === "canciones") {
+    const rotulo = document.createElement("p");
+    rotulo.className = "rotulo";
+    rotulo.textContent = "Biblioteca";
+    panel.appendChild(rotulo);
+
+    const lista = document.createElement("div");
+    lista.className = "lista";
+    for (const c of CANCIONES) {
+      const b = document.createElement("button");
+      b.innerHTML = `${c.titulo}<small>${c.orden} · ${c.credito}</small>`;
+      b.setAttribute("aria-current", String(c.id === estado.cancion.id));
+      b.onclick = () => { estado.cancion = c; pintarPanel(); mostrarDiapo(0); };
+      lista.appendChild(b);
+    }
+    panel.appendChild(lista);
+
+    const rot2 = document.createElement("p");
+    rot2.className = "rotulo";
+    rot2.textContent = "Secciones · orden " + estado.cancion.orden;
+    panel.appendChild(rot2);
+
+    // Una pastilla por bloque de sección: el coro repetido del orden real sale dos veces.
+    const chips = document.createElement("div");
+    chips.className = "chips";
+    estado.cancion.diapos.forEach((d, i) => {
+      const previa = chips.lastElementChild;
+      if (previa && previa.dataset.seccion === d.seccion) return;
+      const c = document.createElement("button");
+      c.className = "chip";
+      c.dataset.seccion = d.seccion;
+      c.dataset.i = i;
+      c.textContent = d.seccion;
+      c.onclick = () => mostrarDiapo(i);
+      chips.appendChild(c);
+    });
+    panel.appendChild(chips);
+  }
+
+  if (estado.tab === "biblia") {
+    const rotulo = document.createElement("p");
+    rotulo.className = "rotulo";
+    rotulo.textContent = "Versión";
+    panel.appendChild(rotulo);
+
+    const versiones = document.createElement("div");
+    versiones.className = "chips";
+    for (const v of ["RV1909", "VBL"]) {
+      const c = document.createElement("button");
+      c.className = "chip";
+      c.textContent = v;
+      c.setAttribute("aria-current", String(v === estado.version));
+      c.onclick = () => { estado.version = v; pintarPanel(); };
+      versiones.appendChild(c);
+    }
+
+    // La RVR1960 no se puede distribuir, pero el hueco donde entra sí se puede mostrar.
+    const rvr = document.createElement("button");
+    rvr.className = "chip ausente";
+    rvr.textContent = "RVR1960";
+    rvr.onclick = () => {
+      panel.querySelector(".nota-biblia").textContent =
+        "La RVR1960 tiene derechos de autor, por eso no viene incluida. Si tu iglesia ya tiene el módulo, " +
+        "lo importas desde Biblia → Importar y aparece aquí mismo, junto a las otras versiones.";
+    };
+    versiones.appendChild(rvr);
+    panel.appendChild(versiones);
+
+    const rot2 = document.createElement("p");
+    rot2.className = "rotulo";
+    rot2.textContent = "Escribe la cita como te salga";
+    panel.appendChild(rot2);
+
+    const lista = document.createElement("div");
+    lista.className = "lista";
+    for (const v of VERSICULOS) {
+      const b = document.createElement("button");
+      b.innerHTML = `${v.ref}<small>escribiste: ${v.escrito}</small>`;
+      b.onclick = () => {
+        proyectar([`<span class="vnum">${v.numero}</span>${v[estado.version]}`], `${v.ref} · ${estado.version}`);
+        previaTexto.textContent = v.ref;
+      };
+      lista.appendChild(b);
+    }
+    panel.appendChild(lista);
+
+    const nota = document.createElement("p");
+    nota.className = "suave nota-biblia";
+    nota.style.cssText = "font-size:.74rem;line-height:1.45";
+    nota.textContent = estado.version === "RV1909"
+      ? "La RV1909 conserva su ortografía de 1909 («á su Hijo»). No es una errata: Coraza no altera el texto bíblico."
+      : "La Versión Biblia Libre está en español de hoy. Es la que viene activada en instalaciones nuevas.";
+    panel.appendChild(nota);
+  }
+
+  if (estado.tab === "textos") {
+    const rotulo = document.createElement("p");
+    rotulo.className = "rotulo";
+    rotulo.textContent = "Plantillas";
+    panel.appendChild(rotulo);
+
+    const lista = document.createElement("div");
+    lista.className = "lista";
+    for (const t of TEXTOS) {
+      const b = document.createElement("button");
+      b.innerHTML = `${t.nombre}<small>${t.lineas[0]}</small>`;
+      b.onclick = () => { proyectar(t.lineas, "Anuncio"); previaTexto.textContent = t.lineas[0]; };
+      lista.appendChild(b);
+    }
+    panel.appendChild(lista);
+
+    const nota = document.createElement("p");
+    nota.className = "suave";
+    nota.style.cssText = "font-size:.74rem;line-height:1.45";
+    nota.textContent = "Con **negrita**, *cursiva*, ==resaltado== y {coral}colores{/} directamente en el texto.";
+    panel.appendChild(nota);
+  }
+}
+
+/* ---------- pestañas ---------- */
+document.querySelectorAll(".pestanas button").forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll(".pestanas button").forEach(o => o.setAttribute("aria-selected", String(o === b)));
+    estado.tab = b.dataset.tab;
+    pintarPanel();
+  };
+});
+
+/* ---------- transiciones: hover para ver, clic para fijar ---------- */
+const barraTrans = document.getElementById("transiciones");
+for (const [clave, nombre] of TRANSICIONES) {
+  const b = document.createElement("button");
+  b.className = "chip";
+  b.textContent = nombre;
+  b.dataset.clave = clave;
+  b.setAttribute("aria-current", String(clave === estado.transicion));
+
+  const demostrar = () => {
+    salida.dataset.trans = clave;
+    const d = contenido.querySelector(".diapo:not(.sale)");
+    if (d) {
+      const copia = [...d.querySelectorAll(".linea")].map(p => p.innerHTML);
+      const ref = d.querySelector(".ref")?.textContent || "";
+      proyectar(copia, ref);
+    }
+  };
+
+  b.addEventListener("mouseenter", demostrar);
+  b.addEventListener("focus", demostrar);
+  b.addEventListener("mouseleave", () => { salida.dataset.trans = estado.transicionFijada; });
+  b.addEventListener("blur", () => { salida.dataset.trans = estado.transicionFijada; });
+  b.onclick = () => {
+    estado.transicion = estado.transicionFijada = clave;
+    salida.dataset.trans = clave;
+    barraTrans.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-current", String(c.dataset.clave === clave)));
+    demostrar();
+  };
+  barraTrans.appendChild(b);
+}
+
+/* ---------- botones de pánico ---------- */
+document.querySelectorAll("[data-panico]").forEach(b => {
+  b.onclick = () => {
+    const q = b.dataset.panico;
+    if (q === "negro") salida.dataset.negro = salida.dataset.negro === "1" ? "0" : "1";
+    if (q === "logo")  salida.dataset.logo  = salida.dataset.logo  === "1" ? "0" : "1";
+    if (q === "texto") salida.dataset.texto = salida.dataset.texto === "0" ? "1" : "0";
+    if (q === "limpiar") { salida.dataset.negro = "0"; salida.dataset.logo = "0"; salida.dataset.texto = "1"; }
+    sincronizarPanico();
+  };
+});
+
+/* ---------- teclado, solo cuando la consola está a la vista ---------- */
+addEventListener("keydown", e => {
+  if (estado.tab !== "canciones") return;
+  const caja = document.getElementById("consola").getBoundingClientRect();
+  if (caja.bottom < 0 || caja.top > innerHeight) return;
+  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); mostrarDiapo(estado.indice + 1); }
+  if (e.key === "ArrowLeft") { e.preventDefault(); mostrarDiapo(estado.indice - 1); }
+});
+
+/* ---------- arranque: la consola abre proyectando, nunca vacía ---------- */
+pintarPanel();
+mostrarDiapo(0);
+</script>
