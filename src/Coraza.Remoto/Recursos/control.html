@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B0909">
+<title>Coraza · control remoto</title>
+
+<!--
+  Interfaz del control remoto.
+
+  Todo va incrustado a propósito: ni CDN, ni fuentes descargadas, ni imágenes. Coraza
+  tiene que funcionar en una iglesia sin internet.
+
+  Regla de oro: hay DOS gestos distintos y nunca se confunden.
+    · Tocar el título  → deja el contenido en VISTA PREVIA (no se ve en la pantalla grande).
+    · Botón PROYECTAR  → sale al vivo.
+
+  Ojo con los índices: /api/buscar y /api/listar comparten la misma lista en el
+  servidor, así que la última petición manda. Por eso, al buscar se limpia la
+  biblioteca y al listar se limpian los resultados: nunca hay dos listas vivas.
+-->
+
+<style>
+  :root {
+    color-scheme: dark;
+    --tinta:#0B0909; --carbon:#151112; --vino:#64242F; --teja:#B44446;
+    --coral:#FC8F8F; --lino:#DFD9D8; --humo:#8B7E80;
+    --linea:rgba(223,217,216,.12);
+  }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body {
+    margin:0; min-height:100dvh; background:var(--tinta); color:var(--lino);
+    font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;
+    display:flex; flex-direction:column; overscroll-behavior:none;
+  }
+  header {
+    display:flex; align-items:center; gap:.5rem; padding:.7rem 1rem;
+    border-bottom:1px solid var(--linea); position:sticky; top:0; background:var(--tinta); z-index:5;
+  }
+  header b { font-weight:600; }
+  #luz { width:9px; height:9px; border-radius:50%; background:var(--humo); flex:none; }
+  #luz.viva { background:var(--coral); }
+  #estado { margin-left:auto; font-size:.75rem; color:var(--humo); }
+
+  main { flex:1; display:flex; flex-direction:column; gap:.7rem; padding:.8rem; }
+  .rotulo { font-size:.64rem; letter-spacing:.18em; text-transform:uppercase; color:var(--humo); }
+  .tarjeta { border:1px solid var(--linea); border-radius:12px; background:var(--carbon); padding:.9rem; }
+  .tarjeta.atenuada { opacity:.55; transition:opacity .15s; }
+
+  #vivo { font-size:1.3rem; font-weight:500; white-space:pre-wrap; min-height:2.6em; margin-top:.3rem; }
+  #etiqueta { color:var(--coral); font-size:.8rem; }
+  #siguiente { color:var(--humo); white-space:pre-wrap; min-height:1.5em; margin-top:.3rem; }
+
+  .panico { display:grid; grid-template-columns:repeat(4,1fr); gap:.4rem; }
+  .panico button {
+    padding:.75rem .2rem; font-size:.72rem; border-radius:10px;
+    border:1px solid var(--linea); background:rgba(11,9,9,.6); color:var(--humo);
+  }
+  .panico button[aria-pressed="true"] { background:rgba(180,68,70,.34); color:#FDF6F5; border-color:rgba(252,143,143,.5); }
+
+  .fichas { display:flex; gap:.35rem; overflow-x:auto; padding-bottom:.2rem; }
+  .fichas button {
+    flex:none; padding:.4rem .7rem; border-radius:999px; font-size:.78rem;
+    border:1px solid var(--linea); background:rgba(223,217,216,.05); color:var(--lino);
+    font-family:ui-monospace,Consolas,monospace;
+  }
+  .fichas button.actual { background:rgba(180,68,70,.34); border-color:rgba(252,143,143,.5); }
+
+  button { font:inherit; color:var(--lino); cursor:pointer; touch-action:manipulation; border:0; }
+  .grandes { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; margin-top:auto; }
+  .grandes button {
+    padding:1.7rem 1rem; font-size:1.8rem; border-radius:14px; color:#FDF6F5;
+    border:1px solid rgba(252,143,143,.32);
+    background:linear-gradient(140deg,rgba(100,36,47,.55),rgba(180,68,70,.32));
+  }
+  .grandes button:active { background:rgba(180,68,70,.6); }
+
+  details { border:1px solid var(--linea); border-radius:12px; background:var(--carbon); }
+  summary { padding:.75rem .9rem; cursor:pointer; font-size:.85rem; color:var(--humo); }
+  .fila { display:flex; align-items:center; gap:.5rem; padding:.55rem .9rem; border-top:1px solid var(--linea); }
+  .fila .tit { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.9rem; }
+  .fila .sub { display:block; font-size:.7rem; color:var(--humo); overflow:hidden; text-overflow:ellipsis; }
+  .fila.enVivo { background:rgba(180,68,70,.18); }
+  .fila .barra { width:3px; align-self:stretch; border-radius:2px; flex:none; }
+  .fila button.proyectar {
+    padding:.4rem .65rem; font-size:.68rem; border-radius:8px; color:#FDF6F5;
+    border:1px solid rgba(252,143,143,.4); background:rgba(180,68,70,.35); flex:none;
+  }
+
+  input, textarea {
+    width:100%; font:inherit; padding:.7rem; border-radius:10px;
+    background:#170809; color:var(--lino); border:1px solid rgba(223,217,216,.18);
+  }
+  textarea { min-height:5.5rem; resize:vertical; }
+  #pin { font-size:2rem; letter-spacing:.5em; text-align:center; }
+  #aviso { color:var(--coral); min-height:1.4em; font-size:.9rem; }
+  #ingreso { gap:.9rem; padding:2rem 1rem; }
+  #mensaje { font-size:.8rem; color:var(--humo); min-height:1.2em; text-align:center; }
+  #mensaje.error { color:var(--coral); }
+  .pie { display:flex; gap:.5rem; }
+  .pie button { flex:1; padding:.7rem; border-radius:10px; border:1px solid var(--linea); background:rgba(11,9,9,.6); color:var(--humo); font-size:.8rem; }
+  .bloque { padding:.7rem .9rem; display:flex; flex-direction:column; gap:.5rem; }
+  .ancho { padding:.8rem; border-radius:10px; color:#FDF6F5;
+           border:1px solid rgba(252,143,143,.32);
+           background:linear-gradient(140deg,rgba(100,36,47,.55),rgba(180,68,70,.32)); }
+  [hidden] { display:none !important; }
+</style>
+
+<header>
+  <span id="luz"></span><b>Coraza</b>
+  <span id="estado"></span>
+</header>
+
+<main id="ingreso">
+  <p class="rotulo">Escribe el PIN que aparece en el computador</p>
+  <input id="pin" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" maxlength="6">
+  <button id="entrar" class="ancho">Entrar</button>
+  <p id="aviso"></p>
+</main>
+
+<main id="control" hidden>
+  <div class="panico">
+    <button data-alterna="Negro">NEGRO</button>
+    <button data-alterna="Logo">LOGO</button>
+    <button data-alterna="OcultarTexto">TEXTO</button>
+    <button data-accion="Limpiar">LIMPIAR</button>
+  </div>
+
+  <div class="tarjeta" id="tarjetaVivo">
+    <div class="rotulo">En vivo <span id="etiqueta"></span></div>
+    <div id="vivo">—</div>
+  </div>
+
+  <div class="tarjeta">
+    <div class="rotulo">Siguiente</div>
+    <div id="siguiente">—</div>
+  </div>
+
+  <div class="fichas" id="secciones"></div>
+
+  <details id="cajaPrevia">
+    <summary id="resumenPrevia">Preparado</summary>
+    <div id="versiones" class="fichas" style="padding:.6rem .9rem 0"></div>
+    <div id="previa"></div>
+  </details>
+
+  <details>
+    <summary id="resumenServicio">Orden del servicio</summary>
+    <div id="servicio"></div>
+  </details>
+
+  <details>
+    <summary>Biblioteca · canciones, imágenes, videos y textos</summary>
+    <div class="bloque">
+      <div class="fichas" id="categorias">
+        <button data-cat="canciones">Canciones</button>
+        <button data-cat="medios">Imágenes y videos</button>
+        <button data-cat="textos">Textos</button>
+      </div>
+    </div>
+    <div id="biblioteca"></div>
+  </details>
+
+  <details>
+    <summary>Buscar</summary>
+    <div class="bloque">
+      <input id="buscar" placeholder="cuán grande · jn 3 16 · bienvenida" autocomplete="off">
+    </div>
+    <div id="resultados"></div>
+  </details>
+
+  <details>
+    <summary>Escribir un anuncio</summary>
+    <div class="bloque">
+      <textarea id="anuncio" placeholder="Reunión de jóvenes&#10;Viernes 7:00 p. m."></textarea>
+      <button id="proyectarAnuncio" class="ancho">PROYECTAR ANUNCIO</button>
+      <p class="rotulo">Queda guardado en la biblioteca de textos.</p>
+    </div>
+  </details>
+
+  <p id="mensaje"></p>
+
+  <div class="grandes">
+    <button data-accion="Anterior" aria-label="Anterior">◀</button>
+    <button data-accion="Siguiente" aria-label="Siguiente">▶</button>
+  </div>
+
+  <div class="pie">
+    <button id="proyectar">Proyectar</button>
+    <button data-accion="EnviarAlVivo">Enviar lo preparado</button>
+  </div>
+</main>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+let token = sessionStorage.getItem("coraza-token");
+let fuente = null, ultimaVersion = -1, proyectando = false;
+
+// ---------- sesión ----------
+
+async function entrar() {
+  let r, datos = {};
+  try {
+    r = await fetch("/api/sesion", { method: "POST", body: JSON.stringify({ pin: $("pin").value }) });
+    datos = await r.json().catch(() => ({}));
+  } catch { $("aviso").textContent = "No se pudo contactar con Coraza."; return; }
+  if (!r.ok) { $("aviso").textContent = datos.Mensaje || "PIN incorrecto."; $("pin").value = ""; return; }
+  token = datos.Token;
+  sessionStorage.setItem("coraza-token", token);
+  $("aviso").textContent = "";
+  abrir();
+}
+
+function salir(motivo) {
+  sessionStorage.removeItem("coraza-token");
+  token = null;
+  if (fuente) { fuente.close(); fuente = null; }
+  $("control").hidden = true; $("ingreso").hidden = false;
+  $("aviso").textContent = motivo; $("pin").value = "";
+}
+
+function abrir() { $("ingreso").hidden = true; $("control").hidden = false; escuchar(); }
+
+// ---------- flujo de estado ----------
+
+function escuchar() {
+  if (fuente) fuente.close();
+  fuente = new EventSource("/api/estado?t=" + encodeURIComponent(token));
+  fuente.onopen = () => { $("luz").classList.add("viva"); $("estado").textContent = ""; };
+  fuente.onerror = () => { $("luz").classList.remove("viva"); $("estado").textContent = "reconectando…"; };
+  fuente.onmessage = ev => {
+    let e;
+    try { e = JSON.parse(ev.data); } catch { return; }
+    if (e.Version <= ultimaVersion) return;   // trama retrasada: no puede retroceder la vista
+    ultimaVersion = e.Version;
+    pintar(e);
+  };
+}
+
+function pintar(e) {
+  proyectando = e.Proyectando;
+  $("vivo").textContent = e.TextoVivo || "—";
+  $("siguiente").textContent = e.TextoSiguiente || "—";
+  $("etiqueta").textContent = e.TotalVivo > 0 ? `· ${e.EtiquetaVivo} (${e.NumeroVivo}/${e.TotalVivo})` : "";
+  $("tarjetaVivo").classList.remove("atenuada");
+
+  for (const b of document.querySelectorAll("[data-alterna]")) {
+    const campo = b.dataset.alterna === "OcultarTexto" ? "TextoOculto" : b.dataset.alterna;
+    b.setAttribute("aria-pressed", String(!!e[campo]));
+  }
+
+  $("proyectar").textContent = e.Proyectando ? "Detener la proyección" : "Proyectar";
+  $("mensaje").textContent = e.Mensaje || "";
+  $("mensaje").className = e.MensajeEsError ? "error" : "";
+
+  pintarSecciones(e.Secciones || []);
+  pintarPrevia(e);
+  pintarVersiones(e);
+  pintarServicio(e.Servicio || [], e.NombreServicio);
+}
+
+function pintarSecciones(secciones) {
+  const caja = $("secciones");
+  if (caja.dataset.firma === secciones.join(",")) return;
+  caja.dataset.firma = secciones.join(",");
+  caja.textContent = "";
+  for (const s of secciones) {
+    const b = document.createElement("button");
+    b.textContent = s;
+    b.onclick = () => mandar("IrASeccion", { Texto: s });
+    caja.appendChild(b);
+  }
+}
+
+/** Lo preparado, diapositiva a diapositiva: aquí se elige QUÉ parte proyectar. */
+function pintarPrevia(e) {
+  const lista = e.Previa || [];
+  $("resumenPrevia").textContent = `Preparado · ${e.TituloPrevia || "nada"} (${lista.length})`;
+
+  const caja = $("previa");
+  const firma = lista.map(d => d.Indice + d.Etiqueta + d.EsVivo).join("|");
+  if (caja.dataset.firma === firma) return;
+  caja.dataset.firma = firma;
+
+  caja.textContent = "";
+  for (const d of lista) {
+    caja.appendChild(crearFila({
+      titulo: d.Seccion ? `${d.Seccion} · ${d.Etiqueta}` : d.Etiqueta,
+      sub: d.Texto,
+      enVivo: d.EsVivo,
+      alTocar: () => mandar("MostrarDiapositivaPrevia", { Indice: d.Indice }),
+      alProyectar: () => mandar("EnviarDiapositivaAlVivo", { Indice: d.Indice }),
+    }));
+  }
+}
+
+/** Versiones bíblicas: solo tienen sentido cuando lo preparado es un pasaje. */
+function pintarVersiones(e) {
+  const caja = $("versiones");
+  const lista = e.EsPasaje ? (e.Versiones || []) : [];
+  const firma = lista.map(v => v.Indice + v.Abreviatura + v.Actual).join("|");
+  if (caja.dataset.firma === firma) return;
+  caja.dataset.firma = firma;
+
+  caja.textContent = "";
+  for (const v of lista) {
+    const b = document.createElement("button");
+    b.textContent = v.Abreviatura;
+    b.title = v.Nombre;
+    if (v.Actual) b.className = "actual";
+    b.onclick = () => mandar("CambiarVersionBiblia", { Indice: v.Indice });
+    caja.appendChild(b);
+  }
+}
+
+function pintarServicio(elementos, nombre) {
+  $("resumenServicio").textContent = `Orden del servicio · ${nombre || ""} (${elementos.length})`;
+  const caja = $("servicio");
+  const firma = elementos.map(x => x.Indice + x.Titulo + x.EnVivo).join("|");
+  if (caja.dataset.firma === firma) return;
+  caja.dataset.firma = firma;
+
+  caja.textContent = "";
+  for (const el of elementos) {
+    const fila = crearFila({
+      titulo: el.Titulo,
+      enVivo: el.EnVivo,
+      color: el.EsEncabezado ? (el.Color || "#B44446") : null,
+      alTocar: () => mandar("MostrarElemento", { Indice: el.Indice }),
+      alProyectar: el.EsEncabezado ? null : () => mandar("EnviarElementoAlVivo", { Indice: el.Indice }),
+    });
+    caja.appendChild(fila);
+  }
+}
+
+/** Fila reutilizable: tocar prepara, el botón proyecta. */
+function crearFila({ titulo, sub, enVivo, color, alTocar, alProyectar }) {
+  const fila = document.createElement("div");
+  fila.className = "fila" + (enVivo ? " enVivo" : "");
+
+  if (color !== undefined && color !== null) {
+    const barra = document.createElement("span");
+    barra.className = "barra";
+    barra.style.background = color;
+    fila.appendChild(barra);
+  }
+
+  const tit = document.createElement("span");
+  tit.className = "tit";
+  tit.textContent = titulo;
+  if (color) tit.style.color = color;
+  if (sub) {
+    const s = document.createElement("span");
+    s.className = "sub";
+    s.textContent = sub;
+    tit.appendChild(s);
+  }
+  if (alTocar) tit.onclick = alTocar;
+  fila.appendChild(tit);
+
+  if (alProyectar) {
+    const b = document.createElement("button");
+    b.className = "proyectar";
+    b.textContent = "PROYECTAR";
+    b.onclick = alProyectar;
+    fila.appendChild(b);
+  }
+  return fila;
+}
+
+// ---------- comandos ----------
+
+async function mandar(accion, extra) {
+  if (!token) return;
+  let r;
+  try {
+    r = await fetch("/api/comando", {
+      method: "POST",
+      headers: { "X-Coraza-Token": token },
+      body: JSON.stringify(Object.assign({ Accion: accion }, extra || {})),
+    });
+  } catch { $("estado").textContent = "sin conexión"; return; }
+
+  if (r.status === 401) { salir("Se cerró la sesión. Pide el PIN de nuevo."); return; }
+  const res = await r.json().catch(() => null);
+  if (res && res.Ok === false && res.Mensaje) $("mensaje").textContent = res.Mensaje;
+}
+
+/** Pinta una lista de resultados (de buscar o de listar) en la caja indicada. */
+function pintarResultados(caja, lista, alLimpiar) {
+  caja.textContent = "";
+  for (const res of lista) {
+    caja.appendChild(crearFila({
+      titulo: `${res.Grupo} · ${res.Titulo}`,
+      sub: res.Detalle,
+      alTocar: () => mandar("ElegirResultado", { Indice: res.Indice }),
+      alProyectar: () => { mandar("EnviarResultadoAlVivo", { Indice: res.Indice }); alLimpiar?.(); },
+    }));
+  }
+}
+
+// ---------- biblioteca ----------
+
+for (const b of document.querySelectorAll("#categorias button")) {
+  b.onclick = async () => {
+    for (const o of document.querySelectorAll("#categorias button")) o.classList.toggle("actual", o === b);
+    if (!token) return;
+    let lista;
+    try {
+      const r = await fetch("/api/listar", {
+        method: "POST",
+        headers: { "X-Coraza-Token": token },
+        body: JSON.stringify({ categoria: b.dataset.cat }),
+      });
+      if (r.status === 401) { salir("Se cerró la sesión. Pide el PIN de nuevo."); return; }
+      lista = await r.json();
+    } catch { return; }
+
+    // El servidor solo recuerda la última lista pedida: se limpia la otra caja.
+    $("resultados").textContent = "";
+    pintarResultados($("biblioteca"), lista);
+  };
+}
+
+// ---------- búsqueda ----------
+
+let rebote = null;
+$("buscar").addEventListener("input", () => { clearTimeout(rebote); rebote = setTimeout(buscar, 250); });
+
+async function buscar() {
+  const consulta = $("buscar").value.trim();
+  const caja = $("resultados");
+  caja.textContent = "";
+  if (consulta.length < 2 || !token) return;
+
+  let lista;
+  try {
+    const r = await fetch("/api/buscar", {
+      method: "POST",
+      headers: { "X-Coraza-Token": token },
+      body: JSON.stringify({ consulta }),
+    });
+    if (r.status === 401) { salir("Se cerró la sesión. Pide el PIN de nuevo."); return; }
+    lista = await r.json();
+  } catch { return; }
+
+  $("biblioteca").textContent = "";   // la última lista pedida es la que vale
+  for (const o of document.querySelectorAll("#categorias button")) o.classList.remove("actual");
+  pintarResultados(caja, lista, () => { $("buscar").value = ""; caja.textContent = ""; });
+}
+
+// ---------- anuncio escrito en el teléfono ----------
+
+$("proyectarAnuncio").onclick = () => {
+  const texto = $("anuncio").value.trim();
+  if (!texto) { $("mensaje").textContent = "Escribe el anuncio primero."; return; }
+  mandar("ProyectarTexto", { Texto: texto });
+  $("anuncio").value = "";
+};
+
+// ---------- enganches ----------
+
+$("entrar").onclick = entrar;
+$("pin").onkeydown = ev => { if (ev.key === "Enter") entrar(); };
+
+for (const b of document.querySelectorAll("[data-accion],[data-alterna]")) {
+  const accion = b.dataset.accion || b.dataset.alterna;
+  b.addEventListener("pointerdown", ev => {
+    ev.preventDefault();
+    navigator.vibrate?.(10);
+    if (accion === "Siguiente" || accion === "Anterior") $("tarjetaVivo").classList.add("atenuada");
+    mandar(accion);
+  });
+}
+
+$("proyectar").onclick = () => {
+  if (proyectando) {
+    if (!confirm("¿Detener la proyección?")) return;
+    mandar("DetenerProyeccion");
+  } else mandar("IniciarProyeccion");
+};
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && token && !$("control").hidden) escuchar();
+});
+
+if (token) abrir();
+</script>
+</html>

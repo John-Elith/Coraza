@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Sin WPF a propósito: así las pruebas pueden cubrir el servidor, el análisis
+         de HTTP y las sesiones, igual que ya ocurre con Coraza.Core y Coraza.Data. -->
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>Coraza.Remoto</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Coraza.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- La página del teléfono viaja dentro del ensamblado: no hay archivos sueltos
+         que copiar ni rutas que resolver en tiempo de ejecución. -->
+    <EmbeddedResource Include="Recursos\*.html" />
+  </ItemGroup>
+
+</Project>

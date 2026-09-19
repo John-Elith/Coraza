@@ -54,6 +54,14 @@ public sealed partial class MainViewModel : ObservableObject
     // En vivo
     [ObservableProperty] private string _tituloVivo = "Nada en vivo";
     [ObservableProperty] private string _siguienteTexto = "";
+    // Las piezas sueltas de lo que está en vivo. TituloVivo es una cadena ya formateada
+    // y el control remoto no puede desarmarla para pintar el número de diapositiva
+    // aparte, así que se publican también por separado.
+    [ObservableProperty] private string _elementoVivoTitulo = "";
+    [ObservableProperty] private string _etiquetaVivo = "";
+    [ObservableProperty] private int _numeroVivo;
+    [ObservableProperty] private int _totalVivo;
+    [ObservableProperty] private string _textoVivo = "";
 
     // Pantallas
     [ObservableProperty] private OpcionPantalla? _pantallaSeleccionada;
@@ -82,6 +90,7 @@ public sealed partial class MainViewModel : ObservableObject
         Textos = new PanelTextosViewModel(this);
         Temas = new PanelTemasViewModel(this);
         Busqueda = new BusquedaUniversalViewModel(this);
+        Remoto = new ServicioControlRemoto(this);
 
         Transiciones = OpcionTransicion.Todas;
         _transicionSeleccionada = Transiciones.FirstOrDefault(t => t.Valor == ctx.Preferencias.TransicionForzada) ?? Transiciones[0];
@@ -137,6 +146,7 @@ public sealed partial class MainViewModel : ObservableObject
     public PanelTextosViewModel Textos { get; }
     public PanelTemasViewModel Temas { get; }
     public BusquedaUniversalViewModel Busqueda { get; }
+    public ServicioControlRemoto Remoto { get; }
 
     public ObservableCollection<ElementoViewModel> Elementos { get; } = new();
     public ObservableCollection<DiapositivaViewModel> Diapositivas { get; } = new();
@@ -213,6 +223,10 @@ public sealed partial class MainViewModel : ObservableObject
             : UnaSolaPantalla
                 ? "Listo. Solo hay una pantalla: al proyectar se abrirá una ventana de ensayo. Ctrl+K para buscar."
                 : "Listo. Pulsa F5 para proyectar o Ctrl+K para buscar.");
+
+        // Al final y aparte: si el control remoto no arranca, avisa y no pasa nada más.
+        // La proyección no depende de él en ningún momento.
+        Remoto.IniciarSiProcede();
     }
 
     /// <summary>
@@ -957,10 +971,21 @@ public sealed partial class MainViewModel : ObservableObject
         {
             TituloVivo = "Nada en vivo";
             SiguienteTexto = "";
+            ElementoVivoTitulo = "";
+            EtiquetaVivo = "";
+            NumeroVivo = 0;
+            TotalVivo = 0;
+            TextoVivo = "";
             return;
         }
         var d = _diapositivasVivo[_indiceVivo];
-        TituloVivo = $"{_elementoVivo.Titulo} · {d.Etiqueta} ({_indiceVivo + 1}/{_diapositivasVivo.Count})";
+        ElementoVivoTitulo = _elementoVivo.Titulo;
+        EtiquetaVivo = d.Etiqueta;
+        NumeroVivo = _indiceVivo + 1;
+        TotalVivo = _diapositivasVivo.Count;
+        TextoVivo = d.TextoPlano;
+        // Se deriva de las anteriores para que no haya dos formateos que mantener.
+        TituloVivo = $"{ElementoVivoTitulo} · {EtiquetaVivo} ({NumeroVivo}/{TotalVivo})";
         SiguienteTexto = _indiceVivo + 1 < _diapositivasVivo.Count
             ? _diapositivasVivo[_indiceVivo + 1].TextoPlano.Replace('\n', ' ')
             : "— Fin del elemento —";

@@ -45,6 +45,14 @@
                 <CheckBox Content="Ocultar el puntero del mouse en la proyección" IsChecked="{Binding OcultarCursor}" Margin="0,10,0,0" />
                 <CheckBox Content="Reducir movimiento: desactiva TODAS las transiciones (para equipos lentos)" IsChecked="{Binding ReducirMovimiento}" Margin="0,8,0,0" />
 
+                <TextBlock Text="CONTROL REMOTO" Style="{StaticResource Seccion}" />
+                <DockPanel>
+                    <Button DockPanel.Dock="Left" Content="Abrir control remoto…" Command="{Binding AbrirControlRemotoCommand}" Margin="0,0,10,0" />
+                    <TextBlock Text="{Binding EstadoControlRemoto}" Style="{StaticResource Rotulo}" />
+                </DockPanel>
+                <TextBlock Style="{StaticResource T.Suave}" TextWrapping="Wrap" TextTrimming="None" Margin="0,6,0,0"
+                           Text="Pasa diapositivas desde el celular por la red local de la iglesia, sin internet y sin cuentas. Se autoriza con un PIN que aparece en esa ventana, y solo puede haber un teléfono conectado a la vez: si entra otro, el primero pierde el mando." />
+
                 <TextBlock Text="PANTALLA DE LOGOTIPO" Style="{StaticResource Seccion}" />
                 <DockPanel>
                     <Button DockPanel.Dock="Left" Content="Elegir imagen…" Command="{Binding ElegirLogoCommand}" Margin="0,0,6,0" />

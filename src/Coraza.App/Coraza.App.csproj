@@ -23,6 +23,7 @@
     <ProjectReference Include="..\Coraza.Core\Coraza.Core.csproj" />
     <ProjectReference Include="..\Coraza.Data\Coraza.Data.csproj" />
     <ProjectReference Include="..\Coraza.Rendering\Coraza.Rendering.csproj" />
+    <ProjectReference Include="..\Coraza.Remoto\Coraza.Remoto.csproj" />
   </ItemGroup>
 
   <ItemGroup>

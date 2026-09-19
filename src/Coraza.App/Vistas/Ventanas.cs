@@ -35,6 +35,113 @@ public static class Ventanas
     public static bool Configuracion(MainViewModel main) =>
         new ConfiguracionWindow(new ConfiguracionViewModel(main)).ShowDialog() == true;
 
+    /// <summary>
+    /// Ventana del control remoto: código QR, PIN, quién está conectado y el firewall.
+    ///
+    /// Se abre con <c>Show()</c> y NO con <c>ShowDialog()</c>, a diferencia del resto:
+    /// si fuera modal, el operador quedaría bloqueado del proyector justo mientras
+    /// empareja el teléfono, que es cuando más falta le hace poder seguir trabajando.
+    /// </summary>
+    public static void ControlRemoto(MainViewModel main)
+    {
+        var vm = new ControlRemotoViewModel(main);
+        var ventana = new Window { Title = "Control remoto", Width = 460, Height = 660, ResizeMode = ResizeMode.CanResize };
+        Dialogo.Preparar(ventana);
+
+        var qr = new Image { Width = 220, Height = 220, Margin = new Thickness(0, 10, 0, 10), HorizontalAlignment = HorizontalAlignment.Center };
+        RenderOptions.SetBitmapScalingMode(qr, BitmapScalingMode.NearestNeighbor);   // sin suavizado: un QR borroso no se lee
+
+        var pin = new TextBlock { FontSize = 34, FontWeight = FontWeights.Bold, HorizontalAlignment = HorizontalAlignment.Center, FontFamily = new FontFamily("Consolas") };
+        var url = new TextBlock { HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 4, 0, 10) };
+        var conectado = new TextBlock { TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 6, 0, 0) };
+        var aviso = new TextBlock { TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 10, 0, 6) };
+        aviso.SetResourceReference(TextBlock.StyleProperty, "T.Suave");
+
+        var direcciones = new ComboBox { Margin = new Thickness(0, 6, 0, 0), DisplayMemberPath = "Direccion" };
+        direcciones.ItemsSource = vm.Direcciones;
+        direcciones.SelectedItem = vm.DireccionElegida;
+        direcciones.SelectionChanged += (_, _) => vm.DireccionElegida = direcciones.SelectedItem as Coraza.Remoto.Red.InterfazLocal;
+        direcciones.Visibility = vm.HayVariasDirecciones ? Visibility.Visible : Visibility.Collapsed;
+
+        var comando = new TextBox { IsReadOnly = true, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 6, 0, 0), MaxHeight = 70 };
+
+        Button Boton2(string texto, string? estilo = null)
+        {
+            var b = new Button { Content = texto, Margin = new Thickness(0, 0, 8, 0), MinWidth = 96 };
+            if (estilo is not null) b.Style = (Style)Application.Current.FindResource(estilo);
+            return b;
+        }
+
+        var encender = Boton2("Encender", "Boton.Primario");
+        var desconectar = Boton2("Desconectar", "Boton.Peligro");
+        var firewall = Boton2("Permitir en el Firewall…");
+        var cerrar = Boton2("Cerrar");
+        cerrar.IsCancel = true;
+
+        void Pintar()
+        {
+            qr.Source = vm.Qr;
+            qr.Visibility = vm.Qr is null ? Visibility.Collapsed : Visibility.Visible;
+            pin.Text = vm.Activo ? vm.Pin : "——————";
+            url.Text = vm.Activo ? vm.Url : "Enciende el control remoto para empezar.";
+            conectado.Text = vm.Conectado;
+            aviso.Text = vm.AvisoFirewall;
+            comando.Text = vm.ComandoManual;
+            firewall.Visibility = vm.MostrarBotonFirewall ? Visibility.Visible : Visibility.Collapsed;
+            comando.Visibility = vm.MostrarBotonFirewall ? Visibility.Visible : Visibility.Collapsed;
+            desconectar.IsEnabled = vm.Activo && main.Remoto.Sesion is not null;
+            encender.Content = vm.Activo ? "Apagar" : "Encender";
+        }
+
+        encender.Click += async (_, _) =>
+        {
+            if (vm.Activo) await vm.ApagarCommand.ExecuteAsync(null);
+            else vm.EncenderCommand.Execute(null);
+            Pintar();
+        };
+        desconectar.Click += (_, _) => { vm.DesconectarCommand.Execute(null); Pintar(); };
+        firewall.Click += (_, _) => { vm.PermitirEnFirewallCommand.Execute(null); Pintar(); };
+        cerrar.Click += (_, _) => ventana.Close();
+
+        // El PIN cambia al conceder o revocar, y la sesión aparece cuando el teléfono
+        // entra: se repinta cada segundo en vez de cablear notificaciones.
+        var reloj = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        reloj.Tick += (_, _) => { vm.Refrescar(); Pintar(); };
+
+        var botones = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 12, 0, 0) };
+        botones.Children.Add(encender);
+        botones.Children.Add(desconectar);
+        botones.Children.Add(cerrar);
+
+        var contenido = new StackPanel();
+        contenido.Children.Add(new TextBlock { Text = "Control remoto", FontSize = 16, FontWeight = FontWeights.SemiBold });
+        contenido.Children.Add(new TextBlock
+        {
+            Text = "Escanea el código con la cámara del teléfono y escribe el PIN. Solo puede haber un teléfono conectado a la vez.",
+            TextWrapping = TextWrapping.Wrap,
+            Margin = new Thickness(0, 6, 0, 0),
+        });
+        contenido.Children.Add(qr);
+        contenido.Children.Add(pin);
+        contenido.Children.Add(url);
+        contenido.Children.Add(direcciones);
+        contenido.Children.Add(conectado);
+        contenido.Children.Add(aviso);
+        contenido.Children.Add(firewall);
+        contenido.Children.Add(comando);
+        contenido.Children.Add(botones);
+
+        var raiz = new DockPanel { Margin = new Thickness(18) };
+        raiz.Children.Add(new ScrollViewer { Content = contenido, VerticalScrollBarVisibility = ScrollBarVisibility.Auto });
+        ventana.Content = raiz;
+
+        vm.CerrarSolicitado += ventana.Close;
+        ventana.Closed += (_, _) => reloj.Stop();
+        Pintar();
+        reloj.Start();
+        ventana.Show();
+    }
+
     /// <summary>Asistente de primer inicio (idioma, Video Beam, tema y versión bíblica).</summary>
     public static void Asistente(MainViewModel main) =>
         new AsistenteWindow(new AsistenteViewModel(main)).ShowDialog();

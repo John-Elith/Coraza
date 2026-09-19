@@ -61,6 +61,14 @@ Distribución sin internet (carpeta + ZIP autocontenidos):
 | Asistente inicial | Iglesia, pantallas y Video Beam (con patrón de prueba), paleta y tema, versión bíblica y licencia CCLI. Se puede reabrir desde Configuración. |
 | Pantalla completa | Esc sale de la pantalla completa; Mayús + Esc limpia. |
 
+## Qué incluye (Fase 3, en curso)
+
+| Área | Funciones |
+|---|---|
+| Control remoto | Pasa diapositivas desde el celular por la **red local**, sin internet y sin cuentas. Se enciende en Configuración → Control remoto, que muestra un código QR y un PIN de 6 dígitos. Desde el teléfono: botones de pánico (negro, logo, ocultar texto, limpiar), avanzar y retroceder, saltar a una sección de la canción, recorrer el orden del servicio y **buscar** canciones o citas bíblicas para dejarlas en vista previa. |
+| Seguridad | **Un solo teléfono a la vez**: si entra otro, el primero pierde el mando en el acto y se ve en el escritorio. El PIN vive solo en memoria, se regenera al conceder y al revocar, y 5 intentos fallidos bloquean un minuto. Reiniciar Coraza revoca cualquier sesión. El tráfico va por HTTP plano dentro de la red local: **basta contra un curioso en la sala, no contra una red hostil.** |
+| Firewall | La ventana lee el estado sin pedir permisos y ofrece crear la regla con **una sola elevación**. Avisa cuando la red está en perfil «Público», donde la regla no se aplica, y muestra el comando de `netsh` por si hay que hacerlo a mano. |
+
 ## Atajos principales
 
 | Atajo | Acción |
@@ -95,7 +103,7 @@ Si junto al ejecutable existe `portable.txt`, todo se guarda en la carpeta `Dato
 
 ## Próximas fases (hoja de ruta del informe)
 
-- **Fase 3 · Novedades:** control remoto desde el celular, pantalla de escenario, salida NDI, morfismo de texto, alertas, Stream Deck y MIDI.
+- **Fase 3 · Novedades:** el control remoto desde el celular ya está (ver arriba). Quedan la pantalla de escenario, la salida NDI, el morfismo de texto, las alertas y el soporte de Stream Deck y MIDI.
 - **Fase 4 · Inteligencia:** detección de versículos por voz, subtítulos en vivo, fondos inteligentes, sincronización opcional.
 
 ## Licencias

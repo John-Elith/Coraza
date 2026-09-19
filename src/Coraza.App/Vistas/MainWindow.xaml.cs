@@ -175,6 +175,11 @@ public partial class MainWindow : Window
         if (ColDerecha.ActualWidth > 0) p.AnchoDerecho = ColDerecha.ActualWidth;
         _vm.Ctx.GuardarPreferencias();
         if (_vm.Proyeccion.Proyectando) _vm.Proyeccion.Detener();
+
+        // Sin esperar: DetenerAsync cierra el escuchador y los flujos abiertos, pero
+        // bloquear aquí el hilo de interfaz podría trabar el cierre. Lo que quede se
+        // lo lleva el fin del proceso.
+        _ = _vm.Remoto.DetenerAsync();
     }
 
     private void AplicarConcentracion()

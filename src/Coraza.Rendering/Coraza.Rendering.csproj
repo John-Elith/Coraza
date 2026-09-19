@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Coraza.Core\Coraza.Core.csproj" />
+    <ProjectReference Include="..\Coraza.Remoto\Coraza.Remoto.csproj" />
   </ItemGroup>
 
 </Project>

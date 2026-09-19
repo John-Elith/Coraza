@@ -33,6 +33,20 @@ public sealed class Preferencias
     /// <summary>El asistente de primer inicio ya se completó u omitió.</summary>
     public bool AsistenteCompletado { get; set; }
     public Dictionary<string, string> Atajos { get; set; } = new();
+    /// <summary>Control remoto desde el celular (Fase 3).</summary>
+    public PreferenciasControlRemoto ControlRemoto { get; set; } = new();
+}
+
+/// <summary>Ajustes del control remoto. Apagado por omisión: se enciende por servicio.</summary>
+public sealed class PreferenciasControlRemoto
+{
+    public bool Activado { get; set; }
+    public int Puerto { get; set; } = 8787;
+    /// <summary>IPv4 elegida cuando el equipo tiene varias (wifi, ethernet, Hyper-V…).</summary>
+    public string? DireccionElegida { get; set; }
+    /// <summary>Ya se ofreció crear la regla del firewall; no insistir en cada arranque.</summary>
+    public bool ReglaFirewallIntentada { get; set; }
+    public bool PermitirRedesPublicas { get; set; }
 }
 
 /// <summary>Acceso a la base de datos, repositorios, índice de búsqueda y preferencias.</summary>

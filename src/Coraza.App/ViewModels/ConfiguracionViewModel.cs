@@ -100,6 +100,22 @@ public sealed partial class ConfiguracionViewModel : ObservableObject
     partial void OnPaletaChanged(string value) => Apariencia.Aplicar(value);
 
     public void RevertirApariencia() => Apariencia.Aplicar(_p.Paleta);
+
+    public string EstadoControlRemoto => _main.Remoto.Activo
+        ? $"Encendido · puerto {_main.Remoto.Puerto}"
+        : "Apagado";
+
+    /// <summary>
+    /// Abre la ventana del control remoto. No se guarda con el resto de la
+    /// configuración: esa ventana aplica sus cambios al momento, porque encender el
+    /// servidor y emparejar un teléfono no tiene sentido «al pulsar Guardar».
+    /// </summary>
+    [RelayCommand]
+    private void AbrirControlRemoto()
+    {
+        Vistas.Ventanas.ControlRemoto(_main);
+        OnPropertyChanged(nameof(EstadoControlRemoto));
+    }
     public IReadOnlyList<OpcionTema> OpcionesTema { get; }
     public IReadOnlyList<VersionBiblia> Biblias { get; }
     public ObservableCollection<AtajoEditable> Atajos { get; } = new();
