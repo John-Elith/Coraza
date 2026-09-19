@@ -10,7 +10,7 @@
     <!-- Debe coincidir con la etiqueta de la Release publicada (v1.0) y con
          instalador.iss. Si el programa se identifica con una versión menor que la
          publicada, el comprobador de actualizaciones avisaría siempre. -->
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <NeutralLanguage>es</NeutralLanguage>
     <SatelliteResourceLanguages>es</SatelliteResourceLanguages>
   </PropertyGroup>

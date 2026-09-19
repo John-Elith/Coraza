@@ -16,7 +16,7 @@
 ; ============================================================================
 
 #define Nombre      "Coraza"
-#define Version     "1.0"
+#define Version     "1.1"
 #define Autor       "John Elith"
 #define Sitio       "https://john-elith.github.io/Coraza/"
 #define Ejecutable  "Coraza.exe"
